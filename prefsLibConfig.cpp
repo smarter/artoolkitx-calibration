@@ -1,24 +1,37 @@
 /*
  *  prefsLibConfig.cpp
- *  ARToolKit6
+ *  artoolkitX
  *
- *  This file is part of ARToolKit.
+ *  This file is part of artoolkitX.
  *
+ *  artoolkitX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  artoolkitX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with artoolkitX.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  As a special exception, the copyright holders of this library give you
+ *  permission to link this library with independent modules to produce an
+ *  executable, regardless of the license terms of these independent modules, and to
+ *  copy and distribute the resulting executable under terms of your choice,
+ *  provided that you also meet, for each linked independent module, the terms and
+ *  conditions of the license of that module. An independent module is a module
+ *  which is neither derived from nor based on this library. If you modify this
+ *  library, you may extend this exception to your version of the library, but you
+ *  are not obligated to do so. If you do not wish to do so, delete this exception
+ *  statement from your version.
+ *
+ *  Copyright 2018 Realmax, Inc.
  *  Copyright 2017-2017 Daqri LLC. All Rights Reserved.
  *
  *  Author(s): Philip Lamb
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
  *
  */
 
@@ -27,17 +40,17 @@
 #  define _GNU_SOURCE
 #endif
 
-#include <AR6/AR/ar.h>
-#if TARGET_PLATFORM_LINUX
+#include <ARX/AR/ar.h>
+#if ARX_TARGET_PLATFORM_LINUX
 
 #include <stdio.h>
 #include "prefs.hpp"
 #include <libconfig.h>
 #include <Eden/EdenMessage.h>
 #include <pthread.h>
-#include <AR6/ARVideo/video.h>
+#include <ARX/ARVideo/video.h>
 #include "flow.hpp"
-#include <AR6/ARUtil/file_utils.h>
+#include <ARX/ARUtil/file_utils.h>
 #include "calib_camera.h"
 
 #define PREFS_FILENAME "prefs"
@@ -118,7 +131,7 @@ void *initPreferences(void)
     if (!prefs->settingCalibSaveDir) prefs->settingCalibSaveDir = config_setting_add(root, kSettingCalibSaveDir, CONFIG_TYPE_STRING);
     if (!prefs->settingCalibrationUpload) {
         prefs->settingCalibrationUpload = config_setting_add(root, kSettingCalibrationUpload, CONFIG_TYPE_BOOL);
-#if defined(ARTOOLKIT6_CSUU) && defined(ARTOOLKIT6_CSAT)
+#if defined(ARTOOLKITX_CSUU) && defined(ARTOOLKITX_CSAT)
         config_setting_set_bool(prefs->settingCalibrationUpload, true);
 #endif
     }
@@ -159,7 +172,7 @@ void *showPreferencesThread(void *arg)
         PREFS_OPTION_CALIB_SAVE,
         PREFS_OPTION_CALIB_SAVE_DIR,
         PREFS_OPTION_CALIB_UPLOAD,
-#if !(defined(ARTOOLKIT6_CSUU) && defined(ARTOOLKIT6_CSAT))
+#if !(defined(ARTOOLKITX_CSUU) && defined(ARTOOLKITX_CSAT))
         PREFS_OPTION_CSUU,
         PREFS_OPTION_CSAT,
 #endif
@@ -189,8 +202,8 @@ void *showPreferencesThread(void *arg)
                 "2. Camera.\n"
                 "3. Save calibration on/off.\n"
                 "4. Save calibration destination directory.\n"
-#if defined(ARTOOLKIT6_CSUU) && defined(ARTOOLKIT6_CSAT)
-                "5. Upload calibration to artoolkit.org on/off.\n"
+#if defined(ARTOOLKITX_CSUU) && defined(ARTOOLKITX_CSAT)
+                "5. Upload calibration to artoolkitx.org on/off.\n"
                 "6. Calibration pattern type.\n"
                 "7. Calibration pattern size.\n"
                 "8. Calibration pattern spacing.\n"
@@ -217,7 +230,7 @@ void *showPreferencesThread(void *arg)
                 else if (inputi == 3) state = PREFS_OPTION_CALIB_SAVE;
                 else if (inputi == 4) state = PREFS_OPTION_CALIB_SAVE_DIR;
                 else if (inputi == 5) state = PREFS_OPTION_CALIB_UPLOAD;
-#if defined(ARTOOLKIT6_CSUU) && defined(ARTOOLKIT6_CSAT)
+#if defined(ARTOOLKITX_CSUU) && defined(ARTOOLKITX_CSAT)
                 else if (inputi == 6) state = PREFS_OPTION_CALIB_PATT_TYPE;
                 else if (inputi == 7) state = PREFS_OPTION_CALIB_PATT_SIZE;
                 else if (inputi == 8) state = PREFS_OPTION_CALIB_PATT_SPACING;
@@ -236,7 +249,7 @@ void *showPreferencesThread(void *arg)
                 inputa = EdenMessageInputGetInput();
                 free(inputa);
             } else {
-                system("xdg-open https://github.com/artoolkit/ar6-wiki/wiki/Camera-calibration-Linux");
+                system("xdg-open https://github.com/artoolkitx/artoolkitx-calibration/wiki");
             }
             state = PREFS_BEGIN;
         } else if (state == PREFS_OPTION_CAMERA) {
@@ -305,8 +318,8 @@ void *showPreferencesThread(void *arg)
             }
         } else if (state == PREFS_OPTION_CALIB_UPLOAD) {
             bool b = config_setting_get_bool(prefs->settingCalibrationUpload);
-#if defined(ARTOOLKIT6_CSUU) && defined(ARTOOLKIT6_CSAT)
-            char prompt[4096] = "Preferences: Upload calibration to artoolkit.org.\n\n";
+#if defined(ARTOOLKITX_CSUU) && defined(ARTOOLKITX_CSAT)
+            char prompt[4096] = "Preferences: Upload calibration to artoolkitx.org.\n\n";
 #else
             char prompt[4096] = "Preferences: Upload calibration to my server.\n\n";
 #endif
@@ -321,7 +334,7 @@ void *showPreferencesThread(void *arg)
                 config_setting_set_bool(prefs->settingCalibrationUpload, !b);
                 ARLOGd("User chose calibration upload %s.\n", (!b ? "on" : "off"));
             }
-#if !defined(ARTOOLKIT6_CSUU) && !defined(ARTOOLKIT6_CSAT)
+#if !defined(ARTOOLKITX_CSUU) && !defined(ARTOOLKITX_CSAT)
         } else if (state == PREFS_OPTION_CSUU) {
             const char *s = config_setting_get_string(prefs->settingCSUU);
             char prompt[4096] = "Preferences: My calibration server URL.\n\n";
@@ -494,8 +507,8 @@ char *getPreferenceCalibrationServerUploadURL(void *preferences)
     
     bool uploadOn = config_setting_get_bool(prefs->settingCalibrationUpload);
     if (!uploadOn) return (NULL);
-#if defined(ARTOOLKIT6_CSUU) && defined(ARTOOLKIT6_CSAT)
-    return (strdup(ARTOOLKIT6_CSUU));
+#if defined(ARTOOLKITX_CSUU) && defined(ARTOOLKITX_CSAT)
+    return (strdup(ARTOOLKITX_CSUU));
 #else
     const char *s = config_setting_get_string(prefs->settingCSUU);
     if (s && s[0]) return strdup(s);
@@ -510,8 +523,8 @@ char *getPreferenceCalibrationServerAuthenticationToken(void *preferences)
     
     bool uploadOn = config_setting_get_bool(prefs->settingCalibrationUpload);
     if (!uploadOn) return (NULL);
-#if defined(ARTOOLKIT6_CSUU) && defined(ARTOOLKIT6_CSAT)
-    return (strdup(ARTOOLKIT6_CSAT));
+#if defined(ARTOOLKITX_CSUU) && defined(ARTOOLKITX_CSAT)
+    return (strdup(ARTOOLKITX_CSAT));
 #else
     const char *s = config_setting_get_string(prefs->settingCSAT);
     if (s && s[0]) return strdup(s);
@@ -570,4 +583,4 @@ void preferencesFinal(void **preferences_p)
     *preferences_p = NULL;
 }
 
-#endif // TARGET_PLATFORM_LINUX
+#endif // ARX_TARGET_PLATFORM_LINUX

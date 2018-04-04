@@ -17,12 +17,11 @@
 #ifndef __Eden_h__
 #  include <Eden/Eden.h>
 #endif
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define APIENTRY
 
 #define GLUTTEXT_BITMAP_ENABLE 0
 #define GLUTTEXT_STROKE_ENABLE 1

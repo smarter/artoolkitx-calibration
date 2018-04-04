@@ -52,9 +52,9 @@
 #  define USE_GL_STATE_CACHE 0
 #  include <Eden/glStateCache.h>
 #elif EDEN_USE_GLES2
-#  include <AR6/ARG/glStateCache2.h>
-#  include <AR6/ARG/arg_shader_gl.h>
-#  include <AR6/ARG/arg_mtx.h>
+#  include <ARX/ARG/glStateCache2.h>
+#  include <ARX/ARG/shader_gl.h>
+#  include <ARX/ARG/mtx.h>
 #endif
 #ifndef GL_GENERATE_MIPMAP
 #  define GL_GENERATE_MIPMAP 0x8191

@@ -41,8 +41,8 @@
 
 /*!
 	@header EdenMath
-	@abstract Math utilities.
-	@discussion
+	@brief Math utilities.
+	@details
 		EdenMath forms one part of the Eden library.
 	@copyright 2001-2013 Philip Lamb
  */
@@ -97,8 +97,8 @@ extern "C" {
 #ifndef M_PI
 /*!
     @defined M_PI
-    @abstract Value of PI.
-    @discussion
+    @brief Value of PI.
+    @details
 		Defined only if not already defined in math.h.
 */
 #define M_PI 3.141592653589793238462643
@@ -106,28 +106,28 @@ extern "C" {
 
 /*!
     @defined PI
-    @abstract Value of PI.
+    @brief Value of PI.
 */
 #define PI				M_PI
 
 /*!
     @defined TWOPI
-    @abstract   (description)
-    @discussion (description)
+    @brief   (description)
+    @details (description)
 */
 #define TWOPI			(2*M_PI)
 
 /*!
     @defined HALFPI
-    @abstract   (description)
-    @discussion (description)
+    @brief   (description)
+    @details (description)
 */
 #define HALFPI			(0.5*M_PI)
 
 /*!
     @defined DTOR
-    @abstract Convert degrees to radians.
-    @discussion
+    @brief Convert degrees to radians.
+    @details
 		Multiply an angle in degrees by this constant to
 		get the value of the angle in radians.
 */
@@ -135,8 +135,8 @@ extern "C" {
 
 /*!
     @defined RTOD
-    @abstract Convert radians to degrees.
-    @discussion
+    @brief Convert radians to degrees.
+    @details
 		Multiply an angle in radians by this constant to
 		get the value of the angle in degrees.
 */
@@ -144,7 +144,7 @@ extern "C" {
 
 /*!
     @defined MIN
-	@abstract Determine minimum of two values.
+	@brief Determine minimum of two values.
 */
 #ifndef MIN
 #define MIN(x,y) (x < y ? x : y)
@@ -152,7 +152,7 @@ extern "C" {
 	
 /*!
 	@defined MAX
-	@abstract Determine maximum of two values.
+	@brief Determine maximum of two values.
 */
 #ifndef MAX
 #define MAX(x,y) (x > y ? x : y)
@@ -160,8 +160,8 @@ extern "C" {
 
 /*!
     @defined CROSS
-    @abstract Vector cross-product in R3.
-    @discussion
+    @brief Vector cross-product in R3.
+    @details
 		6 multiplies + 3 subtracts.
 		Vector cross product calculates a vector with direction
 		orthogonal to plane formed by the other two vectors, and length
@@ -175,44 +175,44 @@ extern "C" {
 
 /*!
     @defined LENGTH
-    @abstract   (description)
-    @discussion (description)
+    @brief   (description)
+    @details (description)
 */
 #define LENGTH(v) (sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]))
 
 /*!
     @defined DOT
-    @abstract Vector dot-product in R3.
-    @discussion
+    @brief Vector dot-product in R3.
+    @details
 		3 multiplies + 2 adds.
 */
 #define DOT(v1,v2) ((v1[0]*v2[0]) + (v1[1]*v2[1]) + (v1[2]*v2[2]))
 
 /*!
     @defined ADD
-    @abstract   (description)
-    @discussion (description)
+    @brief   (description)
+    @details (description)
 */
 #define ADD(dest,v1,v2) {dest[0] = v1[0] + v2[0]; dest[1] = v1[1] + v2[1]; dest[2] = v1[2] + v2[2];}
 
 /*!
     @defined SUB
-    @abstract   (description)
-    @discussion (description)
+    @brief   (description)
+    @details (description)
 */
 #define SUB(dest,v1,v2) {dest[0] = v1[0] - v2[0]; dest[1] = v1[1] - v2[1]; dest[2] = v1[2] - v2[2];}
 
 /*!
     @defined AVERAGE
-	@abstract   (description)
-	@discussion (description)
+	@brief   (description)
+	@details (description)
  */
 #define AVERAGE(dest,v1,v2) {dest[0] = (v1[0] + v2[0])*0.5; dest[1] = (v1[1] + v2[1])*0.5; dest[2] = (v1[2] + v2[2])*0.5;}
 	
 /*!
     @defined COPY
-	@abstract   (description)
-	@discussion (description)
+	@brief   (description)
+	@details (description)
  */
 #define COPY(dest, v) {dest[0] = v[0]; dest[1] = v[1]; dest[2] = v[2];}
 
@@ -221,25 +221,22 @@ extern "C" {
 // ============================================================================
 
 /*!
-    @function
-    @abstract Normalise a vector.
-    @discussion
+    @brief Normalise a vector.
+    @details
     @param	v Vector to normalise.
 */
 float EdenMathNormalise(float v[3]);
 
 /*!
-    @function
-	@abstract Normalise a vector.
-	@discussion
+    @brief Normalise a vector.
+	@details
 	@param	v Vector to normalise.
 */
 double EdenMathNormalised(double v[3]);
 	
 /*!
-    @function
-    @abstract Calculates the Hessian normal (unit normal vector) to a plane.
-    @discussion
+    @brief Calculates the Hessian normal (unit normal vector) to a plane.
+    @details
 		The plane is specified by three vectors which are points on the plane.
  
 		The normal calculated is of unit length (i.e. it is the Hessian normal).
@@ -258,8 +255,8 @@ void EdenMathPointsToPlaneHessianNormal(float n[3], float *p, const float p1[3],
 
 /*!
     @function 
-    @abstract   Calculate the general form of a plane, given three points lying on the plane.
-    @discussion
+    @brief   Calculate the general form of a plane, given three points lying on the plane.
+    @details
 		The general form of a plane is the equation Ax + By + Cz + D = 0.
 		The plane is specified by three vectors which are points on the plane.
 		The vector ABC is normal to the plane (not unit normal though).
@@ -275,8 +272,8 @@ void EdenMathPointsToPlane(float abc[3], float *d, const float p1[3], const floa
 
 /*!
     @function 
-    @abstract   Calculate the point of intersection (if any) between a line and a plane.
-    @discussion
+    @brief   Calculate the point of intersection (if any) between a line and a plane.
+    @details
 		See http://mathworld.wolfram.com/Plane.html
     @param      intersection Pointer to an array of 3 floats which will be
 		filled out with the coordinates of the point of intersection.
@@ -300,8 +297,8 @@ EDEN_BOOL EdenMathIntersectionLinePlane(float intersection[3], float *u_out, con
 
 /*!
     @function 
-	@abstract   Caclulate signed distance from point to a plane.
-	@discussion
+	@brief   Caclulate signed distance from point to a plane.
+	@details
 		See http://mathworld.wolfram.com/Point-PlaneDistance.html
 	@param      x0 Position of the point.
 	@param		abc The vector of values A, B, and C from the general definition of a plane
@@ -315,61 +312,54 @@ EDEN_BOOL EdenMathIntersectionLinePlane(float intersection[3], float *u_out, con
 float EdenMathCalcDistanceToPlane(const float x0[3], const float abc[3], const float d);
 
 /*!
-    @function
-	@abstract   Creates a 3x3 identity matrix.
-	@discussion
+    @brief   Creates a 3x3 identity matrix.
+	@details
 	@param      mtx9 A 3x3 matrix that will receive the output.
  */
 void EdenMathIdentityMatrix3by3(float mtx9[9]);
 
 /*!
-    @function
-    @abstract Multiplies 3x3 matrix B into 3x3 matrix A, placing result in C.
-    @discussion
+    @brief Multiplies 3x3 matrix B into 3x3 matrix A, placing result in C.
+    @details
 		A, B and C are in column-major form, which is standard for OpenGL
 		(wheras the usual mathematical matrix notation is row-major.)
 */
 void EdenMathMultMatrix3by3(float C[9], const float B[9], const float A[9]);
 
 /*!
-    @function
-    @abstract Invert a 3x3 matrix A, placing result in Ainv.
-    @discussion
+    @brief Invert a 3x3 matrix A, placing result in Ainv.
+    @details
 		A and Ainv are in column-major form, which is standard for OpenGL
 		(wheras the usual mathematical matrix notation is row-major.)
 */
 EDEN_BOOL EdenMathInvertMatrix3by3(float A[9], float Ainv[9]);
 
 /*!
-    @function
-    @abstract   Creates a 4x4 identity matrix.
-    @discussion
+    @brief   Creates a 4x4 identity matrix.
+    @details
     @param      mtx16 A 4x4 matrix that will receive the output.
 */
 void EdenMathIdentityMatrix(float mtx16[16]);
 
 /*!
-    @function
-    @abstract Multiplies 4x4 matrix B into 4x4 matrix A, placing result in C.
-    @discussion
+    @brief Multiplies 4x4 matrix B into 4x4 matrix A, placing result in C.
+    @details
 		A, B and C are in column-major form, which is standard for OpenGL
 		(wheras the usual mathematical matrix notation is row-major.)
 */
 void EdenMathMultMatrix(float C[16], const float B[16], const float A[16]);
 
 /*!
-    @function
-	@abstract Multiplies 4x4 matrix B into 4x4 matrix A, placing result in C.
-	@discussion
+    	@brief Multiplies 4x4 matrix B into 4x4 matrix A, placing result in C.
+	@details
 		A, B and C are in column-major form, which is standard for OpenGL
 		(wheras the usual mathematical matrix notation is row-major.)
  */
 void EdenMathMultMatrixd(double C[16], const double B[16], const double A[16]);
 
 /*!
-    @function
-    @abstract   Compute inverse of 4x4 transformation matrix
-    @discussion Code contributed by Jacques Leroy jle\@star.be
+    @brief   Compute inverse of 4x4 transformation matrix
+    @details Code contributed by Jacques Leroy jle\@star.be
     @param      m Input, 4x4 column-major matrix.
     @param      out Output, 4x4 column-major matrix.
     @result     Return TRUE for success, FALSE for failure (singular matrix)
@@ -377,9 +367,8 @@ void EdenMathMultMatrixd(double C[16], const double B[16], const double A[16]);
 EDEN_BOOL EdenMathInvertMatrix(float out[16], const float m[16]);
 
 /*!
-    @function
-    @abstract   Compute inverse of 4x4 transformation matrix
-    @discussion Code contributed by Jacques Leroy jle\@star.be
+    @brief   Compute inverse of 4x4 transformation matrix
+    @details Code contributed by Jacques Leroy jle\@star.be
     @param      m Input, 4x4 column-major matrix.
     @param      out Output, 4x4 column-major matrix.
     @result     Return TRUE for success, FALSE for failure (singular matrix)
@@ -387,27 +376,25 @@ EDEN_BOOL EdenMathInvertMatrix(float out[16], const float m[16]);
 EDEN_BOOL EdenMathInvertMatrixd(double out[16], const double m[16]);
 
 /*!
-    @function
-    @abstract   Multiples 4x4 matrix A into column vector p, placing result in q.
-    @discussion 
+    @brief   Multiples 4x4 matrix A into column vector p, placing result in q.
+    @details 
          A is in column-major form, which is standard for OpenGL
          (wheras the usual mathematical matrix notation is row-major.)
 */
 void EdenMathMultMatrixByVector(float q[4], const float A[16], const float p[4]);
     
 /*!
-     @function
-     @abstract   Multiples 4x4 matrix A into column vector p, placing result in q.
-     @discussion 
-     A is in column-major form, which is standard for OpenGL
-     (wheras the usual mathematical matrix notation is row-major.)
+    @brief   Multiples 4x4 matrix A into column vector p, placing result in q.
+    @details 
+        A is in column-major form, which is standard for OpenGL
+        (wheras the usual mathematical matrix notation is row-major.)
 */
 void EdenMathMultMatrixByVectord(double q[4], const double A[16], const double p[4]);
 
 /*!
     @function 
-    @abstract   Creates a matrix which represents translation by a vector.
-    @discussion
+    @brief   Creates a matrix which represents translation by a vector.
+    @details
 	@param      mtx16 A 4x4 matrix that will receive the output in column major form.
 	@param		x X component of the translation vector.
 	@param		y Y component of the translation vector.
@@ -416,9 +403,8 @@ void EdenMathMultMatrixByVectord(double q[4], const double A[16], const double p
 void EdenMathTranslationMatrix(float mtx16[16], const float x, const float y, const float z);
 
 /*!
-    @function
-    @abstract   Translate a matrix by a vector.
-    @discussion
+    @brief   Translate a matrix by a vector.
+    @details
 	@param      B A 4x4 matrix that will receive the output in column major form.
 	@param      A A 4x4 matrix that will supply the input in column major form.
 	@param		x X component of the translation vector.
@@ -428,9 +414,8 @@ void EdenMathTranslationMatrix(float mtx16[16], const float x, const float y, co
 void EdenMathTranslateMatrix(float B[16], const float A[16], const float x, const float y, const float z);
 
 /*!
-    @function
-	@abstract Creates a matrix which represents the general case of a rotation about an arbitrary axis.
-	@discussion
+    @brief Creates a matrix which represents the general case of a rotation about an arbitrary axis.
+	@details
 	@param      mtx16 A 4x4 matrix that will receive the output in column major form.
 	@param		q The angle of rotation measured in a right-hand sense, in radians.
 	@param		x X component of the normalised non-zero vector representing the axis of rotation.
@@ -440,9 +425,8 @@ void EdenMathTranslateMatrix(float B[16], const float A[16], const float x, cons
 void EdenMathRotationMatrix(float mtx16[16], const float q, const float x, const float y, const float z);
 
 /*!
-    @function
-    @abstract Rotate a matrix about an arbitrary axis.
-    @discussion (description)
+    @brief Rotate a matrix about an arbitrary axis.
+    @details (description)
 	@param      B A 4x4 matrix that will receive the output in column major form.
 	@param      A A 4x4 matrix that will supply the input in column major form.
 	@param		q The angle of rotation measured in a right-hand sense, in radians.
@@ -457,10 +441,9 @@ void EdenMathScalingMatrix(float mtx16[16], const float x, const float y, const 
 void EdenMathScaleMatrix(float B[16], const float A[16], const float x, const float y, const float z);
 
 /*!
-    @function
-	@abstract Creates a rotation matrix that rotates a vector called
+    @brief Creates a rotation matrix that rotates a vector called
 		"from" into another vector called "to".
-    @discussion
+    @details
 		Author: Tomas Moller, 1999
 	@param      from Normalised non-zero vector.
 	@param      to Normalised non-zero vector.
@@ -469,9 +452,8 @@ void EdenMathScaleMatrix(float B[16], const float A[16], const float x, const fl
 void EdenMathRotationMatrixFromTo(const float from[3], const float to[3], float mtx9[9]);
 
 /*!
-    @function
-	@abstract Rotate a point about an arbitrary axis.
-	@discussion
+    @brief Rotate a point about an arbitrary axis.
+	@details
 	@param      p2 Rotated point.
 	@param      p1 Point to rotate.
 	@param		q The angle of rotation measured in a right-hand sense, in radians.
@@ -480,9 +462,8 @@ void EdenMathRotationMatrixFromTo(const float from[3], const float to[3], float 
 void EdenMathRotatePointAboutAxis(float p2[3], const float p1[3], const float q, const float a[3]);
 
 /*!
-    @function
-	@abstract Rotate a point about an arbitrary axis.
-	@discussion
+    @brief Rotate a point about an arbitrary axis.
+	@details
 	@param      p2 Rotated point.
 	@param      p1 Point to rotate.
 	@param		q The angle of rotation measured in a right-hand sense, in radians.
@@ -492,9 +473,8 @@ void EdenMathRotatePointAboutAxisd(double p2[3], const double p1[3], const doubl
 
 #ifdef __ppc__
 /*!
-    @function
-    @abstract Fast calculation of square root.
-    @discussion
+    @brief Fast calculation of square root.
+    @details
 		Uses a ppc-only instruction to get an estimate of the
 		square root, then performs 4 iterations of
 		Newton-Rhapson refinement to give better precision.
@@ -510,9 +490,8 @@ void EdenMathRotatePointAboutAxisd(double p2[3], const double p1[3], const doubl
 void fsqrt(double *arg);
 
 /*!
-    @function
-	@abstract Fast calculation of three square roots.
-	@discussion
+    @brief Fast calculation of three square roots.
+	@details
 		Uses a ppc-only instruction to get an estimate of the
 		square root, then performs 4 iterations of
 		Newton-Rhapson refinement to give better precision.
@@ -531,9 +510,8 @@ void fsqrt(double *arg);
 void fsqrt3(double *arg1, double *arg2, double *arg3);
 
 /*!
-    @function
-	@abstract Fast calculation of reciprocal square root.
-	@discussion
+    @brief Fast calculation of reciprocal square root.
+	@details
 		Uses a ppc-only instruction to get an estimate of the
 		reciprocal square root, then performs 4 iterations of
 		Newton-Rhapson refinement to give better precision.
@@ -549,9 +527,8 @@ void fsqrt3(double *arg1, double *arg2, double *arg3);
 void frsqrt(double *arg);
 
 /*!
-    @function
-	@abstract Fast calculation of three reciprocal square roots.
-	@discussion
+    @brief Fast calculation of three reciprocal square roots.
+	@details
 		Uses a ppc-only instruction to get an estimate of the
 		reciprocal square root, then performs 4 iterations of
 		Newton-Rhapson refinement to give better precision.

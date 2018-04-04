@@ -42,10 +42,10 @@
 
 /*!
 	@header EdenError
-	@abstract Error codes and error reporting for the Eden library.
+	@brief Error codes and error reporting for the Eden library.
 	@version 1.0.0
 	@updated 2004-06-01
-	@discussion
+	@details
 */
 
 #ifndef __EdenError_h__
@@ -70,8 +70,8 @@ extern "C" {
 
 /*!
     @enum EDEN_E_*
-    @abstract Symbolic codes for errors reported by routines in the Eden Library.
-	@discussion
+    @brief Symbolic codes for errors reported by routines in the Eden Library.
+	@details
 		As the actual numerical values for certain errors may change from time
 		to time, these symbolic codes should be used instead.
 	@constant EDEN_E_NONE No error.
@@ -131,8 +131,8 @@ enum {
 // ============================================================================
 /*!
 	@typedef EDEN_E_t
-	@abstract Return type of routines in the Eden Library.
-	@discussion
+	@brief Return type of routines in the Eden Library.
+	@details
 		Zero and positive values are used to report success, and possibly, return data.
 		An error is indicated by a value less than zero. Symbolic values for the error
 		codes are available.
@@ -148,23 +148,21 @@ typedef signed int EDEN_E_t;
 // ============================================================================
  
 /*!
-    @function
-    @abstract Produce an error string from an Eden Library error code.
-    @discussion
+    @brief Produce an error string from an Eden Library error code.
+    @details
 		Produces a null-terminated ASCII string with a description of the error
 		represented by the supplied code, followed by the code itself, in brackets.
 		See also EdenError_strerror_r, EdenError_perror.
     @param code The code to produce the string for, as returned by various routines
 		in the Eden Library.
     @result Pointer to a null-terminated constant character string.
-    @seealso EdenError_strerror_r EdenError_strerror_r
+    @see EdenError_strerror_r EdenError_strerror_r
  */
 const char *EdenError_strerror(const EDEN_E_t code);
 
 /*!
-	@function
-	@abstract Produce an error string from an Eden Library error code.
-	@discussion
+	@brief Produce an error string from an Eden Library error code.
+	@details
 		Produces an ASCII string with a description of the error
 		corresponding to the supplied code, and copies up to buflen
 		characters of the string into strerrbuf
@@ -181,14 +179,13 @@ const char *EdenError_strerror(const EDEN_E_t code);
 		to contain the error string, returns ERANGE and strerrbuf
 		will contain an error message that has been truncated and NUL terminated
 		to fit the length specified by buflen.
-    @seealso EdenError_strerror EdenError_strerror
+    @see EdenError_strerror EdenError_strerror
  */
 int EdenError_strerror_r(const EDEN_E_t code, char *strerrbuf, const size_t buflen);
 
 /*!
-    @function
-    @abstract Print an Eden Library error message and code to stderr, with optional string.
-    @discussion
+    @brief Print an Eden Library error message and code to stderr, with optional string.
+    @details
 		Finds the error message corresponding to the supplied code,
 		and writes it, followed by a newline, to the standard error file
 		descriptor.  If the argument string is non-NULL and does not point
@@ -197,8 +194,8 @@ int EdenError_strerror_r(const EDEN_E_t code, char *strerrbuf, const size_t bufl
 		the error message string is printed.
 	@param code The code to produce the string for, as returned by various routines
 		in the Eden Library.
-    @seealso EdenError_strerror EdenError_strerror
-    @seealso EdenError_strerror_r EdenError_strerror_r
+    @see EdenError_strerror EdenError_strerror
+    @see EdenError_strerror_r EdenError_strerror_r
  */
 void EdenError_perror(const EDEN_E_t code, const char *string);
 

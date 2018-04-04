@@ -1,25 +1,38 @@
 /*
  *  Calibration.cpp
- *  ARToolKit6 Camera Calibration Utility
+ *  artoolkitX Camera Calibration Utility
  *
- *  This file is part of ARToolKit.
+ *  This file is part of artoolkitX.
  *
+ *  artoolkitX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  artoolkitX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with artoolkitX.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  As a special exception, the copyright holders of this library give you
+ *  permission to link this library with independent modules to produce an
+ *  executable, regardless of the license terms of these independent modules, and to
+ *  copy and distribute the resulting executable under terms of your choice,
+ *  provided that you also meet, for each linked independent module, the terms and
+ *  conditions of the license of that module. An independent module is a module
+ *  which is neither derived from nor based on this library. If you modify this
+ *  library, you may extend this exception to your version of the library, but you
+ *  are not obligated to do so. If you do not wish to do so, delete this exception
+ *  statement from your version.
+ *
+ *  Copyright 2018 Realmax, Inc.
  *  Copyright 2015-2017 Daqri, LLC.
  *  Copyright 2002-2015 ARToolworks, Inc.
  *
  *  Author(s): Hirokazu Kato, Philip Lamb
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
  *
  */
 
@@ -238,12 +251,12 @@ bool Calibration::capture()
     pthread_mutex_unlock(&m_cornerFinderResultLock);
 
     if (saved) {
-        ARLOG("---------- %2d/%2d -----------\n", (int)m_corners.size(), m_calibImageCountMax);
+        ARPRINT("---------- %2d/%2d -----------\n", (int)m_corners.size(), m_calibImageCountMax);
         const std::vector<cv::Point2f>& corners = m_corners.back();
         for (std::vector<cv::Point2f>::const_iterator it = corners.begin(); it < corners.end(); it++) {
-            ARLOG("  %f, %f\n", it->x, it->y);
+            ARPRINT("  %f, %f\n", it->x, it->y);
         }
-        ARLOG("---------- %2d/%2d -----------\n", (int)m_corners.size(), m_calibImageCountMax);
+        ARPRINT("---------- %2d/%2d -----------\n", (int)m_corners.size(), m_calibImageCountMax);
     }
     
     return (saved);

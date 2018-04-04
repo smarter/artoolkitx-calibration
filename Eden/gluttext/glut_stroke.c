@@ -5,7 +5,7 @@
 #  include <Eden/glStateCache.h>
 #elif EDEN_USE_GLES2
 #  include <stdlib.h>
-#  include <AR6/ARG/glStateCache2.h>
+#  include <ARX/ARG/glStateCache2.h>
 #endif
 
 /* Copyright (c) Mark J. Kilgard, 1994. */

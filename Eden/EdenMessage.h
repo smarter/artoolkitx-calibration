@@ -45,10 +45,10 @@
 
 /*!
 	@header EdenMessage
-	@abstract Send messages and show text-input dialog boxes on the screen.
+	@brief Send messages and show text-input dialog boxes on the screen.
 	@version 1.0.0
 	@updated 2013-11-12
-	@discussion
+	@details
 	@copyright 2001-2013 Philip Lamb
  */
 
@@ -88,8 +88,8 @@ extern EDEN_BOOL gEdenMessageKeyboardRequired;
 
 /*!
     @function 
-    @abstract   Initialise the message library.
-    @discussion
+    @brief   Initialise the message library.
+    @details
 		Must be called before any access to EdenMessage*() functions.
     @param      contextsActiveCount Maximum number of OpenGL contexts.
     @result     TRUE if succcessful, FALSE in case of error.
@@ -98,8 +98,8 @@ EDEN_BOOL EdenMessageInit(const int contextsActiveCount);
 
 /*!
     @function 
-    @abstract   Finalise the message library.
-    @discussion (description)
+    @brief   Finalise the message library.
+    @details (description)
 		Should be called after no more EdenMessage*() functions need be called.
 	@result     TRUE if succcessful, FALSE in case of error.
 */
@@ -107,8 +107,8 @@ EDEN_BOOL EdenMessageFinal(void);
 
 /*!
     @function 
-    @abstract   Prepare a message for drawing on the screen.
-    @discussion
+    @brief   Prepare a message for drawing on the screen.
+    @details
 		Chops up a message of not more than MESSAGE_LENGTH_MAX characters into lines to
 		fit inside a shaded box. The maximum dimensions of the box are 50% of the
 		screen width and 80% of the screen height. The box is padded left and right 4
@@ -128,8 +128,8 @@ EDEN_E_t EdenMessageShow(const unsigned char *msg);
 
 /*!
     @function 
-	@abstract   Remove a message from drawing on the screen.
-	@discussion
+	@brief   Remove a message from drawing on the screen.
+	@details
 		Removes a message previously shown with EdenMessageShow() from the screen.
 		This function should only be used in single-threaded applications. In
 		multi-threaded applications (in which a separate, blockable thread is
@@ -142,8 +142,8 @@ EDEN_E_t EdenMessageHide(void);
 
 /*!
     @function 
-	@abstract   Prepare a text-input dialog for user interaction.
-	@discussion
+	@brief   Prepare a text-input dialog for user interaction.
+	@details
 		Prepares a prompt message for drawing on the screen, and then place
 		a cursor at the end of the message, and collects input keystrokes
 		from the user until the user presses return.
@@ -158,8 +158,8 @@ EDEN_E_t EdenMessageInputShow(const unsigned char *prompt, const unsigned int mi
 
 /*!
     @function 
-    @abstract   Remove a text-input dialog for user interaction.
-    @discussion
+    @brief   Remove a text-input dialog for user interaction.
+    @details
 		Removes a message dialog previously shown with EdenMessageInputShow() from the screen.
 		This function should only be used in single-threaded applications. In
 		multi-threaded applications (in which a separate, blockable thread is
@@ -174,8 +174,8 @@ EDEN_BOOL EdenMessageInputIsComplete(void);
 
 /*!
     @function 
-    @abstract   Prepare a message for drawing on the screen.
-    @discussion
+    @brief   Prepare a message for drawing on the screen.
+    @details
 		Prepares a message for drawing on the screen (by calling through
 		to EdenMessageShow()), and waits the indicated number of seconds
 		before hiding the message (by calling through to EdenMessageHide())
@@ -193,8 +193,8 @@ EDEN_E_t EdenMessage(unsigned char *msg, const unsigned int secs);
 
 /*!
     @function 
-    @abstract   Prepare a text-input dialog for user interaction.
-    @discussion
+    @brief   Prepare a text-input dialog for user interaction.
+    @details
 		Prepares a prompt message for drawing on the screen, and then place
 		a cursor at the end of the message, and collects input keystrokes
 		from the user until the user presses return.
@@ -215,9 +215,8 @@ EDEN_E_t EdenMessage(unsigned char *msg, const unsigned int secs);
 EDEN_E_t EdenMessageInput(const unsigned char *prompt, const unsigned int minLength, const unsigned int maxLength, int intOnly, int fpOnly, int alphaOnly);
 
 /*!
-    @function
-    @abstract Get the result of an input operation
-    @discussion
+    @brief Get the result of an input operation
+    @details
         Gets the result of the input operation via a string copy.
     @result
         A string containing the content.  If the user has cancelled input
@@ -230,9 +229,8 @@ EDEN_E_t EdenMessageInput(const unsigned char *prompt, const unsigned int minLen
 unsigned char *EdenMessageInputGetInput(void);
 
 /*!
-    @function
-    @abstract Set the view size to use in calculations when aligning message box.
-    @discussion
+    @brief Set the view size to use in calculations when aligning message box.
+    @details
         The positioning of the message box is calculated each frame using
         the values supplied here.
     @param width Viewport width in pixels.
@@ -244,8 +242,8 @@ void EdenMessageSetBoxParams(const float width, const float padding);
     
 /*!
     @function 
-    @abstract   Draw previously-prepared text in a box onto the framebuffer.
-    @discussion
+    @brief   Draw previously-prepared text in a box onto the framebuffer.
+    @details
 		Draws a shaded white-outlined box box onto the screen and draws
 		lines of text previously prepared with EdenMessageShow() into it.
 		When the variable gEdenMessageDrawRequired is set, this function
@@ -263,8 +261,8 @@ void EdenMessageDraw(const int contextIndex, const float viewProjection[16]);
 
 /*!
     @function 
-    @abstract Pass user keystrokes to message library for use in dialogs.
-    @discussion
+    @brief Pass user keystrokes to message library for use in dialogs.
+    @details
 		This function processes keystrokes for a message dialog.
 		When the global variable gEdenMessageKeyboardRequired is set, any keystrokes collected
 		from the user by the calling program should be passed to this function,

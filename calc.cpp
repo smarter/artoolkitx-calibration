@@ -1,25 +1,38 @@
 /*
  *  calc.cpp
- *  ARToolKit6
+ *  artoolkitX
  *
- *  This file is part of ARToolKit.
+ *  This file is part of artoolkitX.
  *
+ *  artoolkitX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  artoolkitX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with artoolkitX.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  As a special exception, the copyright holders of this library give you
+ *  permission to link this library with independent modules to produce an
+ *  executable, regardless of the license terms of these independent modules, and to
+ *  copy and distribute the resulting executable under terms of your choice,
+ *  provided that you also meet, for each linked independent module, the terms and
+ *  conditions of the license of that module. An independent module is a module
+ *  which is neither derived from nor based on this library. If you modify this
+ *  library, you may extend this exception to your version of the library, but you
+ *  are not obligated to do so. If you do not wish to do so, delete this exception
+ *  statement from your version.
+ *
+ *  Copyright 2018 Realmax, Inc.
  *  Copyright 2015-2017 Daqri LLC. All Rights Reserved.
  *  Copyright 2012-2015 ARToolworks, Inc. All Rights Reserved.
  *
  *  Author(s): Philip Lamb, Hirokazu Kato
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
  *
  */
 
@@ -156,7 +169,7 @@ void calc(const int capturedImageNum,
             }
         }
         err = sqrtf(err/(patternSize.width*patternSize.height));
-        ARLOG("Err[%2d]: %f[pixel]\n", k + 1, err);
+        ARPRINT("Err[%2d]: %f[pixel]\n", k + 1, err);
 
         // Track min, avg, and max error.
         if (err < err_min) err_min = err;
@@ -220,7 +233,7 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     olen = dist_factor[6];
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
     ilen = dist_factor[6] - ix;
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
@@ -231,7 +244,7 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     olen = xsize - dist_factor[6];
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
     ilen = ix - dist_factor[6];
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
@@ -242,7 +255,7 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     olen = dist_factor[7];
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
     ilen = dist_factor[7] - iy;
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
@@ -253,7 +266,7 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     olen = ysize - dist_factor[7];
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
     ilen = iy - dist_factor[7];
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
@@ -265,14 +278,14 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
     ilen = dist_factor[6] - ix;
     olen = dist_factor[6];
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
     }
     ilen = dist_factor[7] - iy;
     olen = dist_factor[7];
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
@@ -283,14 +296,14 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
     ilen = ix - dist_factor[6];
     olen = xsize - dist_factor[6];
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
     }
     ilen = dist_factor[7] - iy;
     olen = dist_factor[7];
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
@@ -301,14 +314,14 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
     ilen = dist_factor[6] - ix;
     olen = dist_factor[6];
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
     }
     ilen = iy - dist_factor[7];
     olen = ysize - dist_factor[7];
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
@@ -319,14 +332,14 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
     ilen = ix - dist_factor[6];
     olen = xsize - dist_factor[6];
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
     }
     ilen = iy - dist_factor[7];
     olen = ysize - dist_factor[7];
-    //ARLOG("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
+    //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;

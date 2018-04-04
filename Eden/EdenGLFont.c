@@ -54,9 +54,9 @@
 #  define USE_GL_STATE_CACHE 0
 #  include <Eden/glStateCache.h>
 #elif EDEN_USE_GLES2
-#  include <AR6/ARG/glStateCache2.h>
-#  include <AR6/ARG/arg_shader_gl.h>
-#  include <AR6/ARG/arg_mtx.h>
+#  include <ARX/ARG/glStateCache2.h>
+#  include <ARX/ARG/shader_gl.h>
+#  include <ARX/ARG/mtx.h>
 #endif
 
 // ============================================================================
@@ -714,8 +714,8 @@ void EdenGLFontDrawLine(const int contextIndex, const float viewProjection[16], 
     if (vOffsetType == V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE) y = vOffset;
     else {
     	float textHeight = EdenGLFontGetHeight();
-    	if (vOffsetType == V_OFFSET_VIEW_TEXT_TOP_TO_VIEW_TOP) y = gViewSettings.height - hOffset - textHeight;
-    	else /* V_OFFSET_VIEW_CENTER_TO_TEXT_CENTER */ y = (gViewSettings.height - textHeight)/2.0f + hOffset;
+    	if (vOffsetType == V_OFFSET_TEXT_TOP_TO_VIEW_TOP) y = gViewSettings.height - vOffset - textHeight;
+    	else /* V_OFFSET_VIEW_CENTER_TO_TEXT_CENTER */ y = (gViewSettings.height - textHeight)/2.0f + vOffset;
     }
     
     if (gFontSettings.font->type == EDEN_GL_FONT_TYPE_TEXTURE) drawSetup(contextIndex, &VTs);
@@ -754,7 +754,7 @@ void EdenGLFontDrawBlock(const int contextIndex, const float viewProjection[16],
     if (vOffsetType == V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE) y = vOffset;
     else {
     	float textHeight = EdenGLFontGetBlockHeight(lines, lineCount);
-    	if (vOffsetType == V_OFFSET_VIEW_TEXT_TOP_TO_VIEW_TOP) y = gViewSettings.height - hOffset - textHeight;
+    	if (vOffsetType == V_OFFSET_TEXT_TOP_TO_VIEW_TOP) y = gViewSettings.height - hOffset - textHeight;
     	else /* V_OFFSET_VIEW_CENTER_TO_TEXT_CENTER */ y = (gViewSettings.height - textHeight)/2.0f + hOffset;
     }
     

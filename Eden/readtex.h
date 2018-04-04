@@ -35,8 +35,7 @@
 
 /*!
     @header readtex
-    @abstract Texture loading from file.
-    @discussion
+    Texture loading from file.
         readtex forms one part of the Eden library.
     @copyright 2001-2013 Philip Lamb
  */
@@ -56,11 +55,9 @@ extern "C" {
     
 #ifdef EDEN_HAVE_LIBJPEG     
 /*!
-    @function
-    @abstract Read a JPEG file and return it as a raw buffer.
-    @discussion
-        Reads a JPEG image from a file into a raw buffer. JPEGs in mono and RGB format
-        are supported.
+    @brief Read a JPEG file and return it as a raw buffer.
+    @details Reads a JPEG image from a file into a raw buffer. JPEGs in mono and RGB format
+    are supported.
     @param fp File pointer to open jpeg file.
     @param w Pointer to location which will be filled with the width of the JPEG image in pixels,
         or NULL if this is not required.
@@ -78,9 +75,7 @@ unsigned char *jpgread (FILE *fp, int *w, int *h, int *nc, float *dpi);
 #endif // EDEN_HAVE_LIBJPEG
     
 /*!
-    @function
-    @abstract Read an image file and return it as a raw buffer.
-    @discussion
+    @brief Read an image file and return it as a raw buffer.
     @param imageFile name of image to read. At present, images in SGI format (.sgi or .rgb)
         and JPEG format (.jpg or .jpeg) are supported.
     @param w Pointer to location which will be filled with the width of the image in pixels,

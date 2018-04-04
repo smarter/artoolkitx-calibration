@@ -43,8 +43,8 @@
 /*!
 
 	@header EdenUtil
-	@abstract Miscellaneous utility routines.
-	@discussion
+	@brief Miscellaneous utility routines.
+	@details
 		EdenUtil forms one part of the Eden library.
 	@copyright 2004-2013 Philip Lamb
  */
@@ -78,34 +78,26 @@ extern "C" {
 // ============================================================================
 
 /*!
-    @function
-    @abstract Do any required setup so that we can check for single keypresses.
-    @discussion
+    @brief Do any required setup so that we can check for single keypresses.
     @result     (description)
 */
 EDEN_BOOL EdenKeyboardHitSetup(void);
 
 /*!
-    @function
-    @abstract Check to see if the user has pressed a key on the keyboard.
-    @discussion
+    @brief Check to see if the user has pressed a key on the keyboard.
     @result     (description)
 */
 EDEN_BOOL EdenKeyboardHit(void);
 
 /*!
-    @function
-    @abstract Do any required cleanup from our use of single keypress detection.
-    @discussion
+    @brief Do any required cleanup from our use of single keypress detection.
     @result     (description)
 */
 EDEN_BOOL EdenKeyboardHitCleanup(void);
 
 /*!
-    @function
-    @abstract Get file name from a path.
-    @discussion
-        Given a full or partial pathname passed in string path,
+    @brief Get file name from a path.
+    @details Given a full or partial pathname passed in string path,
         returns a pointer to the first char of the filename
         portion of path.
 	@param path Full or partial pathname.
@@ -115,10 +107,8 @@ EDEN_BOOL EdenKeyboardHitCleanup(void);
 char *EdenGetFileNameFromPath(const char *path);
 
 /*!
-    @function
-    @abstract Get file extension from a path.
-    @discussion
-        Given a full or partial pathname passed in string path,
+    @brief Get file extension from a path.
+    @details Given a full or partial pathname passed in string path,
         returns a string with the extension portion of path,
         i.e. the text after the rightmost '.' character, if any.
         If the filename contains no '.', NULL is returned.
@@ -131,10 +121,8 @@ char *EdenGetFileNameFromPath(const char *path);
 char *EdenGetFileExtensionFromPath(const char *path, int convertToLowercase);
 
 /*!
-    @function
-    @abstract Get directory name from a path.
-    @discussion
-        Given a full or partial pathname passed in string path,
+    @brief Get directory name from a path.
+    @details Given a full or partial pathname passed in string path,
         returns a string with the directory name portion of path.
         The string is not terminated by the directory separator.
 	@param path Full or partial pathname.
@@ -144,10 +132,8 @@ char *EdenGetFileExtensionFromPath(const char *path, int convertToLowercase);
 char *EdenGetDirectoryNameFromPath(const char *path);
 
 /*!
-    @function
-    @abstract Return the path to the current executable
-    @discussion
-        Return the path to the current executable, where such a
+    @brief Return the path to the current executable
+    @details Return the path to the current executable, where such a
         linkage between path and execution exists and is readable.
     @result NULL if the path could not be determined,
         otherwise, the path as a NULL-terminated dynamically-allocated
@@ -158,10 +144,8 @@ char *EdenGetExecutablePath(void);
     
 
 /*!
-    @function
-    @abstract Get a path as a file URI.
-    @discussion
-        Given a full or partial pathname passed in string path,
+    @brief Get a path as a file URI.
+    @details Given a full or partial pathname passed in string path,
         returns a string with the file URI for that path.
  
         Partial pathnames are handled by concatening with the

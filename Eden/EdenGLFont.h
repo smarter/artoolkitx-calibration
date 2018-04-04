@@ -42,10 +42,10 @@
 
 /*!
     @header EdenGLFont
-    @abstract Handle font-related operations under OpenGL.
+    @brief Handle font-related operations under OpenGL.
     @version 1.0.0
     @updated 2013-11-12
-    @discussion
+    @details
     @copyright 2001-2013 Philip Lamb
  */
 
@@ -84,7 +84,7 @@ typedef enum {
 } H_OFFSET_TYPE;
 
 typedef enum {
-    V_OFFSET_VIEW_TEXT_TOP_TO_VIEW_TOP,
+    V_OFFSET_TEXT_TOP_TO_VIEW_TOP,
     V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE,
     V_OFFSET_VIEW_CENTER_TO_TEXT_CENTER
 } V_OFFSET_TYPE;
@@ -95,8 +95,8 @@ typedef enum {
 
 /*!
     @function 
-    @abstract   Initialise the font library.
-    @discussion
+    @brief   Initialise the font library.
+    @details
 		Must be called before any access to EdenGLFont*() functions.
     @param      contextsActiveCount Maximum number of OpenGL contexts.
     @result     TRUE if succcessful, FALSE in case of error.
@@ -105,8 +105,8 @@ EDEN_BOOL EdenGLFontInit(const int contextsActiveCount);
 
 /*!
     @function 
-    @abstract   Finalise the font library.
-    @discussion
+    @brief   Finalise the font library.
+    @details
 		Should be called after no more EdenGLFont*() functions need be called.
 	@result     TRUE if succcessful, FALSE in case of error.
 */
@@ -114,8 +114,8 @@ EDEN_BOOL EdenGLFontFinal(void);
 
 /*!
     @function 
-	@abstract   Create a texture font for later use.
-    @discussion
+	@brief   Create a texture font for later use.
+    @details
 		Creates font info required to use the font contained in the texture file
         named at pathname.
  
@@ -134,15 +134,15 @@ EDEN_BOOL EdenGLFontFinal(void);
 	@param      pathname Pathname (absolute, or relative to current working directory) to font texture file.
 	@result     Pointer to a EDEN_GL_FONT_INFO_t opaque structure. This pointer can be used with other
         EdenGLFont functions just as if it was a built-in font.
-    @seealso EdenGLFontDeleteTextureFont EdenGLFontDeleteTextureFont
-    @seealso EdenGLFontLoadTextureFontForContext EdenGLFontLoadTextureFontForContext
+    @see EdenGLFontDeleteTextureFont EdenGLFontDeleteTextureFont
+    @see EdenGLFontLoadTextureFontForContext EdenGLFontLoadTextureFontForContext
 */
 EDEN_GL_FONT_INFO_t *EdenGLFontNewTextureFont(const char *fontName, const char *pathname, const float naturalHeight, const float naturalWidth);
 
 /*!
     @function 
-    @abstract   Delete a previously created texture font.
-    @discussion (description)
+    @brief   Delete a previously created texture font.
+    @details (description)
     @param      fontInfo_p Pointer to a pointer to EDEN_GL_FONT_INFO_t opaque structure
         previously returned from EdenGLFontLoadBitmapFont(). On return, the location
         pointed to will be set to NULL.
@@ -151,45 +151,42 @@ EDEN_GL_FONT_INFO_t *EdenGLFontNewTextureFont(const char *fontName, const char *
         OpenGL and does not require a valid OpenGL context. OpenGL resource
         loading is achieved by calling EdenGLFontLoadTextureFontForContext() PRIOR
         to calling this function.
-    @seealso EdenGLFontNewTextureFont EdenGLFontNewTextureFont
-    @seealso EdenGLFontUnloadTextureFontForContext EdenGLFontUnloadTextureFontForContext
+    @see EdenGLFontNewTextureFont EdenGLFontNewTextureFont
+    @see EdenGLFontUnloadTextureFontForContext EdenGLFontUnloadTextureFontForContext
 */
 void EdenGLFontDeleteTextureFont(EDEN_GL_FONT_INFO_t **fontInfo_p);
 
 /*!
     @function 
-    @abstract   Set the font to be used for subsequent draw calls.
-    @discussion
+    @brief   Set the font to be used for subsequent draw calls.
+    @details
         Drawing by default uses the font EDEN_GL_FONT_ID_Stroke_MonoRoman.
         This function changes the font for subsequent drawing calls.
     @param      font Pointer to a EDEN_GL_FONT_INFO_t opaque structure, either for one
         of the built-in fonts, or previously returned from EdenGLFontNewTextureFont()
-    @seealso EdenGLFontNewTextureFont EdenGLFontNewTextureFont
-    @seealso EdenGLFontLoadTextureFontForContext EdenGLFontLoadTextureFontForContext
+    @see EdenGLFontNewTextureFont EdenGLFontNewTextureFont
+    @see EdenGLFontLoadTextureFontForContext EdenGLFontLoadTextureFontForContext
  */
 void EdenGLFontSetFont(EDEN_GL_FONT_INFO_t *font);
 
 /*!
-    @function
-    @abstract   Get the font to be used for subsequent draw calls.
-    @discussion
+    @brief   Get the font to be used for subsequent draw calls.
+    @details
     @result Pointer to a EDEN_GL_FONT_INFO_t opaque structure, either for one
         of the built-in fonts, or previously returned from EdenGLFontNewTextureFont()
  */
 EDEN_GL_FONT_INFO_t * EdenGLFontGetFont(void);
 
 /*!
-    @function
-    @abstract Set the font size.
-    @discussion 
+    @brief Set the font size.
+    @details 
     @param points Font size in points. Default is 16 point.
  */
 void EdenGLFontSetSize(const float points);
 
 /*!
-    @function
-    @abstract Get the currently set font size.
-    @discussion 
+    @brief Get the currently set font size.
+    @details 
     @result Font size in points. Default is 16 point.
  */
 float EdenGLFontGetSize(void);
@@ -199,45 +196,40 @@ void EdenGLFontSetColor(const float rgba[4]);
 void EdenGLFontGetColor(float rgba[4]);
 
 /*!
-    @function
-    @abstract Set character spacing (i.e. "kerning").
-    @discussion
+    @brief Set character spacing (i.e. "kerning").
+    @details
         Character spacing is the spacing between the edges of adjacent characters.
     @param spacing Spacing expressed as a percentage of the font size. Default is 0.0625f (i.e. 1/16).
  */
 void EdenGLFontSetCharacterSpacing(const float spacing);
 
 /*!
-    @function
-    @abstract Get character spacing (i.e. "kerning").
-    @discussion
+    @brief Get character spacing (i.e. "kerning").
+    @details
         Character spacing is the spacing between the edges of adjacent characters.
     @result Spacing expressed as a percentage of the font size. Default is 0.0625f (i.e. 1/16).
  */
 float EdenGLFontGetCharacterSpacing(void);
 
 /*!
-    @function
-    @abstract Set line spacing (i.e. "leading").
-    @discussion
+    @brief Set line spacing (i.e. "leading").
+    @details
         Default is  to 1.125f (i.e. 9/8).
     @param spacing Line spacing.
  */
 void EdenGLFontSetLineSpacing(const float spacing);
 
 /*!
-    @function
-    @abstract Get line spacing (i.e. "leading").
-    @discussion
+    @brief Get line spacing (i.e. "leading").
+    @details
         Default is  to 1.125f (i.e. 9/8).
     @result Line spacing.
  */
 float EdenGLFontGetLineSpacing(void);
 
 /*!
-    @function
-    @abstract Set word spacing (i.e. adjust width of the space character).
-    @discussion
+    @brief Set word spacing (i.e. adjust width of the space character).
+    @details
         Word spacing is the spacing between adjacent words.
 
         This adjustment applies only to non-monospaced fonts.
@@ -246,9 +238,8 @@ float EdenGLFontGetLineSpacing(void);
 void EdenGLFontSetWordSpacing(const float spacing);
 
 /*!
-    @function
-    @abstract Get word spacing (i.e. adjust width of the space character).
-    @discussion
+    @brief Get word spacing (i.e. adjust width of the space character).
+    @details
         Word spacing is the spacing between adjacent words.
  
         This adjustment applies only to non-monospaced fonts.
@@ -257,9 +248,8 @@ void EdenGLFontSetWordSpacing(const float spacing);
 float EdenGLFontGetWordSpacing(void);
 
 /*!
-    @function
-    @abstract Set set display resolution.
-    @discussion
+    @brief Set set display resolution.
+    @details
         The display resolition is used to calculate font heights in pixels.
         Default is 72.0f, at which a 16-point font will occupy 16 pixels.
     @param pixelsPerInch Display resolution, in pixels per inch.
@@ -267,9 +257,8 @@ float EdenGLFontGetWordSpacing(void);
 void EdenGLFontSetDisplayResolution(const float pixelsPerInch); // Pixels per inch. Used to calculate font heights in pixels. Default is 72.0f, at which a 16-point font will occupy 16 pixels.
 
 /*!
-    @function
-    @abstract Get previously set display resolution.
-    @discussion
+    @brief Get previously set display resolution.
+    @details
         The display resolition is used to calculate font heights in pixels.
         Default is 72.0f, at which a 16-point font will occupy 16 pixels.
     @result Previously set display resolution, in pixels per inch.
@@ -278,8 +267,8 @@ float EdenGLFontGetDisplayResolution(void); // Pixels per inch.
 
 /*!
     @function 
-    @abstract   Tell the font library about the view size.
-    @discussion
+    @brief   Tell the font library about the view size.
+    @details
 		Normally, this will be called during the windowing system's reshape callback.
     @param      widthInPixels Width of the view, in pixels.
 	@param      heightInPixels Height of the view, in pixels.
@@ -287,18 +276,16 @@ float EdenGLFontGetDisplayResolution(void); // Pixels per inch.
 void EdenGLFontSetViewSize(const float widthInPixels, const float heightInPixels);
     
 /*!
-    @function
-    @abstract Gets the height (in pixels) of the currently selected font.
-    @discussion 
+    @brief Gets the height (in pixels) of the currently selected font.
+    @details 
         Takes into account font size (in points) and display resolution (in pixels per inch).
     @result Height in pixels.
  */
 float EdenGLFontGetHeight(void);
 
 /*!
-    @function
-    @abstract Gets the width (in pixels) of a chracter of the currently selected font.
-    @discussion
+    @brief Gets the width (in pixels) of a chracter of the currently selected font.
+    @details
         Takes into account font size (in points) and display resolution (in pixels per inch).
         Does not include any inter-character spacing.
     @param c ASCII character code of the character. For texture fonts, the full 8 buts of c are considered.
@@ -307,9 +294,8 @@ float EdenGLFontGetHeight(void);
 float EdenGLFontGetCharacterWidth(const unsigned char c);
 
 /*!
-    @function
-    @abstract Gets the width (in pixels) of a line of characters of the currently selected font.
-    @discussion
+    @brief Gets the width (in pixels) of a line of characters of the currently selected font.
+    @details
         Takes into account font size (in points) and display resolution (in pixels per inch).
         Includes inter-character spacing.
     @param line A null-terminated (C string) of the characters to measure.
@@ -318,9 +304,8 @@ float EdenGLFontGetCharacterWidth(const unsigned char c);
 float EdenGLFontGetLineWidth(const unsigned char *line);
 
 /*!
-    @function
-    @abstract Calculate the width of a block of text (i.e. the width of the widest line) in pixels.
-    @discussion 
+    @brief Calculate the width of a block of text (i.e. the width of the widest line) in pixels.
+    @details 
         Includes inter-character spacing.
     @param lines An array of C strings (i.e. an array of (char *)). Each item in the array points to a null-terminated C string.
     @param lineCount Number of strings in array 'lines'.
@@ -329,9 +314,8 @@ float EdenGLFontGetLineWidth(const unsigned char *line);
 float EdenGLFontGetBlockWidth(const unsigned char **lines, const unsigned int lineCount);  // Returns width in pixels, taking into account font, font size, display resolution, and character spacing.
 
 /*!
-    @function
-    @abstract Calculate the height of a block of text in pixels.
-    @discussion
+    @brief Calculate the height of a block of text in pixels.
+    @details
         Includes effects of line spacing greater than 1.0.
     @param lines An array of C strings (i.e. an array of (char *)). Each item in the array points to a null-terminated C string.
     @param lineCount Number of strings in array 'lines'.
@@ -340,9 +324,8 @@ float EdenGLFontGetBlockWidth(const unsigned char **lines, const unsigned int li
 float EdenGLFontGetBlockHeight(const unsigned char **lines, const unsigned int lineCount);  // Returns height in pixels, taking into account font, font size, display resolution, and line spacing.
 
 /*!
-    @function
-    @abstract 
-    @discussion
+    @brief 
+    @details
         Requires a valid OpenGL context at the time of the call.
         Make sure EdenSurfacesInit() has been previously called with a valid number of contexts.
     @param contextIndex
@@ -352,9 +335,8 @@ float EdenGLFontGetBlockHeight(const unsigned char **lines, const unsigned int l
 EDEN_BOOL EdenGLFontSetupFontForContext(const int contextIndex, EDEN_GL_FONT_INFO_t *fontInfo);
 
 /*!
-    @function
-    @abstract 
-    @discussion 
+    @brief 
+    @details 
         Requires a valid OpenGL context at the time of the call.
     @param contextIndex
     @param fontInfo
@@ -364,8 +346,8 @@ EDEN_BOOL EdenGLFontCleanupFontForContext(const int contextIndex, EDEN_GL_FONT_I
 
 /*!
     @function 
-    @abstract   Draw a single line of text into the framebuffer.
-    @discussion
+    @brief   Draw a single line of text into the framebuffer.
+    @details
 		Should be called once per frame, generally after all other drawing is complete.
         Requires a valid OpenGL context at the time of the call.
 
@@ -403,8 +385,8 @@ void EdenGLFontDrawLine(const int contextIndex, const float viewProjection[16], 
 
 /*!
     @function 
-    @abstract   Draw a block of multiple lines of text into the framebuffer.
-    @discussion
+    @brief   Draw a block of multiple lines of text into the framebuffer.
+    @details
 		Should be called once per frame, generally after all other drawing is complete.
         Requires a valid OpenGL context at the time of the call.
  

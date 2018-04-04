@@ -42,10 +42,10 @@
 
 /*!
 	@header EdenTime
-	@abstract Time utility routines.
+	@brief Time utility routines.
 	@version 1.0.1
 	@updated 2005-09-07
-	@discussion
+	@details
 		EdenTime forms one part of the Eden library, and it makes
 		use of other parts of the library for its internal operations.
 	@related EdenLog
@@ -70,10 +70,11 @@ extern "C" {
 #  include <sys/time.h>					// struct timespec, struct timeval, gettimeofday()
 #else
 #  ifndef PTHREAD_H						// pthreads_win32 also defines struct timespec.
-struct timespec {
-	long tv_sec;
-	long tv_nsec;
-};
+	#define _CRT_NO_TIME_T
+	struct timespec {
+		long tv_sec;
+		long tv_nsec;
+	};
 #  endif // !PTHREAD_H
 #endif
 
@@ -82,20 +83,18 @@ struct timespec {
 // ============================================================================
 
 /*!
-    @function 
-    @abstract   Get current time in fractional seconds.
-    @discussion
-		Supported via system calls on Unix, WIN32, and MacOS.
+     
+	@brief Get current time in fractional seconds.
+	@details Supported via system calls on Unix, WIN32, and MacOS.
 		Other systems which support GLUT are also supported (with lesser accuracy.)
     @result     The time.
 */
 double EdenTimeInSeconds(void);
 
 /*!
-    @function 
-    @abstract   Get current time, add microseconds offset to it, and return as a timespec.
-    @discussion
-		Gets an absolute time in seconds and nanoseconds elapsed since
+     
+	@brief Get current time, add microseconds offset to it, and return as a timespec.
+	@details Gets an absolute time in seconds and nanoseconds elapsed since
 		epoch (Jan 1, 1970), add parameter 'microseconds' microseconds
 		and return in a timespec structure, suitable e.g. for passing to
 		functions such as pthread_cond_timedwait().
@@ -107,10 +106,9 @@ double EdenTimeInSeconds(void);
 void EdenTimeAbsolutePlusOffset(struct timespec *result, const long microseconds);
 
 /*!
-    @function 
-    @abstract   Generate human-readable string representing time.
-    @discussion (description)
-		Put character string with a human-readable representation of the
+     
+	@brief Generate human-readable string representing time.
+	@details Put character string with a human-readable representation of the
 		time passed in parameter 'seconds' into 's'.
 		On Unix, Windows and other platforms supporting the ctime();
 		system function call, the string returned will be in ctime
@@ -128,9 +126,8 @@ char *EdenTimeInSecondsToText(const double seconds, char s[25]);
 
 #ifndef _WINRT
 /*!
-    @function 
-    @abstract   Sleep the specified number of microseconds.
-    @discussion
+     
+	@brief Sleep the specified number of microseconds.
 		Uses an OS-dependent routine. On Unix platforms, usleep; On Windows
 		platforms, Sleep; on Mac OS (Classic) platform, Delay.
 	@param      microseconds How many microseconds (millionths of a second) to sleep.
@@ -140,10 +137,9 @@ void EdenTime_usleep(const unsigned int microseconds);
 #endif // !_WINRT
 
 /*!
-    @function 
-    @abstract   Sleep the specified number of seconds.
-	@discussion
-		Uses an OS-dependent routine. On Unix platforms, sleep; On Windows
+     
+	@brief Sleep the specified number of seconds.
+	@details Uses an OS-dependent routine. On Unix platforms, sleep; On Windows
 		platforms, Sleep; on Mac OS (Classic) platform, Delay.
     @param      seconds How many seconds to sleep.
 */

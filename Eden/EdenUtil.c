@@ -50,12 +50,12 @@
 #if defined(EDEN_UNIX)
 #  include <termios.h>				// struct termios, tcgetattr(), tcsetattr()
 #  include <strings.h>				// bzero(), required for FD_ZERO().
+#  include <sys/time.h>
 #  define SELECT_IS_IN_SELECT_H 1
 #  if SELECT_IS_IN_SELECT_H
 #    include <sys/select.h>			// fd_set, FD_ZERO(), FD_SET(), select()
 #  else
 #    include <sys/types.h>
-#    include <sys/time.h>
 #  endif
 #  include <sys/param.h>            // MAXPATHLEN
 #  ifdef __APPLE__

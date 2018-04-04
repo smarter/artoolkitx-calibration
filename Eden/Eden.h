@@ -6,7 +6,7 @@
 //  (i.e., implicitly included from every source file.)
 //
 //  Copyright (c) 2001-2016 Philip Lamb (PRL) phil@eden.net.nz. All rights reserved.
-//	
+//
 //
 
 // @@BEGIN_EDEN_LICENSE_HEADER@@
@@ -50,7 +50,7 @@
 #include <stdio.h>
 #ifndef _WIN32 // errno is defined in stdlib.h on Windows.
 #  include <sys/errno.h>
-#endif 
+#endif
 #ifdef __ANDROID__
 #  include <android/log.h>
 #endif
@@ -58,7 +58,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
 #ifdef __ANDROID__
 #  define EDEN_LOG(...)  __android_log_print(ANDROID_LOG_INFO, "libeden", __VA_ARGS__);
 #  define EDEN_LOGe(...) __android_log_print(ANDROID_LOG_ERROR, "libeden", __VA_ARGS__);
@@ -74,7 +74,7 @@ extern "C" {
 // byte-aligned.)
 // I don't know how to do this in compilers other than GCC at the moment.
 #if defined(__GNUC__)
-#  if defined(__BIG_ENDIAN__) 
+#  if defined(__BIG_ENDIAN__)
 #    define EDEN_BIGENDIAN  // Most Significant Byte has greatest address in memory.
 #  endif
 #  define EDEN_INLINE_H extern inline
@@ -83,7 +83,7 @@ extern "C" {
 #else
 #  define EDEN_PACKED
 #endif
-	
+
 // GCC on Mac OS X.
 #if defined(__APPLE__)
 #  define EDEN_UNIX
@@ -97,12 +97,16 @@ extern "C" {
 #  else
 #    error
 #  endif
-    
+
 #  if TARGET_OS_IPHONE
 #    define EDEN_IPHONEOS
+#    define EDEN_USE_GL 0
 #    define EDEN_USE_GLES2 1
+#    define EDNE_USE_GL3 0
 #  else
 #    define EDEN_USE_GL 1
+#    define EDEN_USE_GLES2 0
+#    define EDEN_USE_GL3 0
 #  endif
 
 #  if !defined(DARWINONLY) && !TARGET_OS_IPHONE
@@ -125,24 +129,38 @@ extern "C" {
 #  ifndef ANDROID
 #    define ANDROID
 #  endif
+#  define EDEN_USE_GL 0
 #  define EDEN_USE_GLES2 1
+#  define EDEN_USE_GL3 0
 
 // GCC on Cygnus GNU for Windows.
 #elif defined(__CYGWIN__)
 #  define EDEN_UNIX		// Its a Unix system too!
 #  define EDEN_SERIAL_POSIX_ONLY // Use only POSIX-compliant serial calls.
 #  define EDEN_USE_GL 1
+#  define EDEN_USE_GLES2 0
+#  define EDEN_USE_GL3 0
 
 // GCC on Linux.
 #elif defined(__linux__)	
 #  define EDEN_UNIX		// Its a Unix-like system.
 //#  define EDEN_HAVE_ARTOOLKIT
+#  ifdef __arm__
+#    define EDEN_USE_GL 0
+#    define EDEN_USE_GLES2 1
+#    define EDEN_USE_GL3 0
+#  else
 #    define EDEN_USE_GL 1
-	
+#    define EDEN_USE_GLES2 0
+#    define EDEN_USE_GL3 0
+#  endif
+
 // GCC on NetBSD.
 #elif defined(__NetBSD__)
 #  define EDEN_UNIX
 #  define EDEN_USE_GL 1
+#  define EDEN_USE_GLES2 0
+#  define EDEN_USE_GL3 0
 
 // Microsoft C++ on Windows.
 #elif defined(_MSC_VER)		
@@ -165,12 +183,14 @@ extern "C" {
 #  define EDEN_INLINE_H
 #  define EDEN_INLINE_C
 #  define EDEN_USE_GL 1
+#  define EDEN_USE_GLES2 0
+#  define EDEN_USE_GL3 0
 
 #else
 #  error Unrecognised compiler in __FILE__.
 #endif
 
-	
+
 //
 // Application code which is dependent on platform capabilities.
 //

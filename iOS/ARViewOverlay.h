@@ -1,6 +1,6 @@
 //
 //  ARViewOverlay.h
-//  ARToolKit6
+//  artoolkitX
 //
 //  Disclaimer: IMPORTANT:  This Daqri software is supplied to you by Daqri
 //  LLC ("Daqri") in consideration of your agreement to the following

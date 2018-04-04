@@ -271,7 +271,7 @@ DQ
                     <button hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="e8F-vF-S4B">
                         <rect key="frame" x="18" y="318" width="226" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Upload calibration to artoolkit.org" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="aDI-Kt-DEp">
+                        <buttonCell key="cell" type="check" title="Upload calibration to artoolkitx.org" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="aDI-Kt-DEp">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>

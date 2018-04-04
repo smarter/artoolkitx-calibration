@@ -1,17 +1,21 @@
 #! /bin/bash
 
 #
-# Build ARToolKit Camera Calibration utility for desktop platforms.
+# Build artoolkitX Camera Calibration utility for desktop platforms.
 #
-# Copyright 2016-2017, DAQRI LLC and ARToolKit Contributors.
+# Copyright 2018, Realmax, Inc.
+# Copyright 2016-2017, DAQRI LLC.
+#
 # Author(s): Philip Lamb, Thorsten Bux, John Wolf, Dan Bell.
 #
 
 # Get our location.
 OURDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-SDK_VERSION='6.0.2'
-SDK_URL_DIR='http://artoolkit-dist.s3.amazonaws.com/artoolkit6/6.0/'
+SDK_VERSION='1.0.0'
+# If the tiny version number is 0, drop it.
+SDK_VERSION_PRETTY=`echo -n "${SDK_VERSION}" | sed -E -e 's/([0-9]+\.[0-9]+)\.0/\1/'`
+SDK_URL_DIR="https://github.com/artoolkitx/artoolkitx/releases/download/${SDK_VERSION_PRETTY}/"
 
 VERSION=`sed -En -e 's/.*VERSION_STRING[[:space:]]+"([0-9]+\.[0-9]+(\.[0-9]+)*)".*/\1/p' ${OURDIR}/version.h`
 # If the tiny version number is 0, drop it.
@@ -110,19 +114,19 @@ if [ "$OS" = "Darwin" ] ; then
 # macOS
 if [ $BUILD_MACOS ] ; then
     
-    # Fetch the AR6.framework from latest build into a location where Xcode will find it.
-    SDK_FILENAME="ARToolKit for macOS v${SDK_VERSION}.dmg"
-    curl -f -o "${SDK_FILENAME}" "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
+    # Fetch the ARX.framework from latest build into a location where Xcode will find it.
+    SDK_FILENAME="artoolkitX for macOS v${SDK_VERSION_PRETTY}.dmg"
+    curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
     hdiutil attach "${SDK_FILENAME}" -noautoopen -quiet -mountpoint "SDK"
-    rm -rf depends/macOS/Frameworks/AR6.framework
-    cp -af SDK/artoolkit6/SDK/Frameworks/AR6.framework depends/macOS/Frameworks
+    rm -rf depends/macOS/Frameworks/ARX.framework
+    cp -af SDK/artoolkitX/SDK/Frameworks/ARX.framework depends/macOS/Frameworks
     hdiutil detach "SDK" -quiet -force
     
     # Make the version number available to Xcode.
     sed -E -i.bak "s/@VERSION@/${VERSION}/" macOS/user-config.xcconfig
     
     (cd macOS
-    xcodebuild -target "ARToolKit6 Camera Calibration Utility" -configuration Release
+    xcodebuild -target "artoolkitX Camera Calibration Utility" -configuration Release
     )
 fi
 # /BUILD_MACOS
@@ -130,21 +134,21 @@ fi
 # iOS
 if [ $BUILD_IOS ] ; then
     
-    # Fetch libAR6 from latest build into a location where Xcode will find it.
-    SDK_FILENAME="ARToolKit for iOS v${SDK_VERSION}.dmg"
-    curl -f -o "${SDK_FILENAME}" "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
+    # Fetch libARX from latest build into a location where Xcode will find it.
+    SDK_FILENAME="artoolkitX for iOS v${SDK_VERSION_PRETTY}.dmg"
+    curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
     hdiutil attach "${SDK_FILENAME}" -noautoopen -quiet -mountpoint "SDK"
-    rm -rf depends/iOS/include/AR6/
-    cp -af SDK/artoolkit6/SDK/include/AR6 depends/iOS/include
-    rm -f depends/iOS/lib/libAR6.a
-    cp -af SDK/artoolkit6/SDK/lib/libAR6.a depends/iOS/lib
+    rm -rf depends/iOS/include/ARX/
+    cp -af SDK/artoolkitX/SDK/include/ARX depends/iOS/include
+    rm -f depends/iOS/lib/libARX.a
+    cp -af SDK/artoolkitX/SDK/lib/libARX.a depends/iOS/lib
     hdiutil detach "SDK" -quiet -force
     
     # Make the version number available to Xcode.
     sed -E -i.bak "s/@VERSION@/${VERSION}/" iOS/user-config.xcconfig
     
     (cd iOS
-    xcodebuild -target "ARToolKit6 Camera Calibration Utility" -configuration Release -destination generic/platform=iOS
+    xcodebuild -target "artoolkitX Camera Calibration Utility" -configuration Release -destination generic/platform=iOS
     )
 fi
 # /BUILD_MACOS
@@ -159,15 +163,14 @@ if [ "$OS" = "Linux" ] ; then
 
 # Linux
 if [ $BUILD_LINUX ] ; then
-    
-    #Before we can install the artoolkit6-dev package we need to install the -lib. As -dev depends on -lib
-    SDK_FILENAME="artoolkit6-lib_${SDK_VERSION}_amd64.deb"
-    curl -f -o "${SDK_FILENAME}" "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
+    #Before we can install the artoolkitx-dev package we need to install the -lib. As -dev depends on -lib
+    SDK_FILENAME="artoolkitx-lib_${SDK_VERSION}_amd64.deb"
+    curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
     sudo dpkg -i "${SDK_FILENAME}"
 
-    # Fetch the artoolkit6-dev package and install it.
-    SDK_FILENAME="artoolkit6-dev_${SDK_VERSION}_amd64.deb"
-    curl -f -o "${SDK_FILENAME}" "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
+    # Fetch the artoolkitx-dev package and install it.
+    SDK_FILENAME="artoolkitx-dev_${SDK_VERSION}_amd64.deb"
+    curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
     sudo dpkg -i "${SDK_FILENAME}"
 
     (cd Linux

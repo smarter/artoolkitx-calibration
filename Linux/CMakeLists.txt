@@ -1,10 +1,10 @@
 #
-# ARToolKit v6.x Camera Calibration (Desktop) Utility
+# artoolkitX Camera Calibration (Desktop) Utility
 #
 # To invoke CMake on this file, from the chosen build directory, invoke:
 #     cmake <path to directory containing this file>.
 #
-# Author(s): Philip Lamb <phil@artoolkit.org>
+# Author(s): Philip Lamb <phil@artoolkitx.org>
 #
 
 #
@@ -20,16 +20,16 @@ if(DEFINED CMAKE_BUILD_TYPE)
   set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 endif()
 
-project("artoolkit6_calib_camera"
-        VERSION 6.0.0
+project("artoolkitx_calib_camera"
+        VERSION 1.0.0
         LANGUAGES CXX C
 )
 
-set(ARTOOLKIT6_HOME "${CMAKE_CURRENT_SOURCE_DIR}/../../artoolkit6")
-set(ARTOOLKIT6_CAMERA_CALIBRATION_HOME "${CMAKE_CURRENT_SOURCE_DIR}/..")
+set(ARTOOLKITX_HOME "${CMAKE_CURRENT_SOURCE_DIR}/../../artoolkitx")
+set(ARTOOLKITX_CAMERA_CALIBRATION_HOME "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
-list(APPEND CMAKE_FIND_ROOT_PATH "${ARTOOLKIT6_HOME}/Source/depends/linux")
-list(APPEND CMAKE_FIND_ROOT_PATH "${ARTOOLKIT6_CAMERA_CALIBRATION_HOME}/depends/linux")
+list(APPEND CMAKE_FIND_ROOT_PATH "${ARTOOLKITX_HOME}/Source/depends/linux")
+list(APPEND CMAKE_FIND_ROOT_PATH "${ARTOOLKITX_CAMERA_CALIBRATION_HOME}/depends/linux")
 
 add_definitions("-DTARGET_PLATFORM_LINUX=1")
 
@@ -37,7 +37,7 @@ add_definitions("-DTARGET_PLATFORM_LINUX=1")
 # If the user didn't define CMAKE_INSTALL_PREFIX, set a local install destination.
 # When building packages, this will typically be overridden with DESTDIR (e.g. "make install DESTDIR=/tmp").
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    set (CMAKE_INSTALL_PREFIX "${ARTOOLKIT6_CAMERA_CALIBRATION_HOME}" CACHE PATH "default install path" FORCE )
+    set (CMAKE_INSTALL_PREFIX "${ARTOOLKITX_CAMERA_CALIBRATION_HOME}" CACHE PATH "default install path" FORCE )
 endif()
 
 # Enable C++11 for GCC/Clang compilers.
@@ -45,7 +45,7 @@ set(CMAKE_CXX_STANDARD "11")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include_directories(${ARTOOLKIT6_CAMERA_CALIBRATION_HOME})
+include_directories(${ARTOOLKITX_CAMERA_CALIBRATION_HOME})
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
@@ -80,9 +80,9 @@ find_package(PkgConfig)
 pkg_check_modules(LIBCONFIG REQUIRED libconfig)
 include_directories(${LIBCONFIG_INCLUDE_DIRS})
 
-include_directories(${ARTOOLKIT6_HOME}/Source/depends/linux/include)
+include_directories(${ARTOOLKITX_HOME}/Source/depends/linux/include)
 
-include(${ARTOOLKIT6_HOME}/SDK/lib/AR6/AR6.cmake)
+include(${ARTOOLKITX_HOME}/SDK/lib/ARX/ARX.cmake)
 
 set(SOURCE
     ../calib_camera.cpp
@@ -133,18 +133,18 @@ set(SOURCE
     ../Eden/gluttext/glutstroke.h
 )
 
-add_executable(artoolkit6_calib_camera ${SOURCE})
+add_executable(${CMAKE_PROJECT_NAME} ${SOURCE})
 
-add_dependencies(artoolkit6_calib_camera
-    AR6
+add_dependencies(${CMAKE_PROJECT_NAME}
+    ARX
 )
 
-#set_target_properties(artoolkit6_calib_camera PROPERTIES
+#set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
 #    INSTALL_RPATH "\$ORIGIN/../lib"
 #)
 
-target_link_libraries(artoolkit6_calib_camera
-    AR6
+target_link_libraries(${CMAKE_PROJECT_NAME}
+    ARX
     ${OPENGL_LIBRARIES}
     ${SDL2_LIBRARIES}
     ${JPEG_LIBRARIES}
@@ -155,12 +155,12 @@ target_link_libraries(artoolkit6_calib_camera
     m
 )
 
-get_directory_property(AR6CC_DEFINES DIRECTORY ${CMAKE_SOURCE_DIR} COMPILE_DEFINITIONS)
-foreach(d ${AR6CC_DEFINES})
+get_directory_property(ARXCC_DEFINES DIRECTORY ${CMAKE_SOURCE_DIR} COMPILE_DEFINITIONS)
+foreach(d ${ARXCC_DEFINES})
     message(STATUS "Defined: " ${d})
 endforeach()
 
-install(TARGETS artoolkit6_calib_camera
+install(TARGETS ${CMAKE_PROJECT_NAME}
     RUNTIME DESTINATION .
 )
 

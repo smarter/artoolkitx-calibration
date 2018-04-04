@@ -1,29 +1,42 @@
 /*
  *  calib_camera.cpp
- *  ARToolKit6
+ *  artoolkitX
  *
  *  Camera calibration utility.
  *
  *  Run with "--help" parameter to see usage.
  *
- *  This file is part of ARToolKit.
+ *  This file is part of artoolkitX.
  *
+ *  artoolkitX is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  artoolkitX is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with artoolkitX.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  As a special exception, the copyright holders of this library give you
+ *  permission to link this library with independent modules to produce an
+ *  executable, regardless of the license terms of these independent modules, and to
+ *  copy and distribute the resulting executable under terms of your choice,
+ *  provided that you also meet, for each linked independent module, the terms and
+ *  conditions of the license of that module. An independent module is a module
+ *  which is neither derived from nor based on this library. If you modify this
+ *  library, you may extend this exception to your version of the library, but you
+ *  are not obligated to do so. If you do not wish to do so, delete this exception
+ *  statement from your version.
+ *
+ *  Copyright 2018 Realmax, Inc.
  *  Copyright 2015-2016 Daqri, LLC.
  *  Copyright 2002-2015 ARToolworks, Inc.
  *
  *  Author(s): Hirokazu Kato, Philip Lamb
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
  *
  */
 
@@ -44,15 +57,15 @@
 #elif defined(__linux) || defined(_WIN32)
 #  include <GL/gl.h>
 #endif
-#include <AR6/AR/ar.h>
-//#include <AR6/ARVideo/video.h>
-#include <AR6/ARVideoSource.h>
-#include <AR6/ARView.h>
-#include <AR6/ARUtil/system.h>
-#include <AR6/ARUtil/thread_sub.h>
-#include <AR6/ARUtil/time.h>
-#include <AR6/ARUtil/file_utils.h>
-#include <AR6/ARG/arg.h>
+#include <ARX/AR/ar.h>
+//#include <ARX/ARVideo/video.h>
+#include <ARX/ARVideoSource.h>
+#include <ARX/ARVideoView.h>
+#include <ARX/ARUtil/system.h>
+#include <ARX/ARUtil/thread_sub.h>
+#include <ARX/ARUtil/time.h>
+#include <ARX/ARUtil/file_utils.h>
+#include <ARX/ARG/arg.h>
 
 #include "fileUploader.h"
 #include "Calibration.hpp"
@@ -142,7 +155,7 @@ FILE_UPLOAD_HANDLE_t *fileUploadHandle = NULL;
 
 // Video acquisition and rendering.
 static ARVideoSource *vs = nullptr;
-static ARView *vv = nullptr;
+static ARVideoView *vv = nullptr;
 static bool gPostVideoSetupDone = false;
 static bool gCameraIsFrontFacing = false;
 static long gFrameCount = 0;
@@ -188,7 +201,7 @@ static void startVideo(void)
         vs->configure(buf, true, NULL, NULL, 0);
         if (!vs->open()) {
             ARLOGe("Error: Unable to open video source.\n");
-            EdenMessageShow((const unsigned char *)"Welcome to ARToolKit Camera Calibrator\n(c)2017 DAQRI LLC.\n\nUnable to open video source.\n\nPress 'p' for settings and help.");
+            EdenMessageShow((const unsigned char *)"Welcome to artoolkitX Camera Calibrator\n(c)2018 Realmax, Inc. & (c)2017 DAQRI LLC.\n\nUnable to open video source.\n\nPress 'p' for settings and help.");
         }
     }
     gPostVideoSetupDone = false;
@@ -309,7 +322,7 @@ int main(int argc, char *argv[])
     gSDLEventPreferencesChanged = SDL_RegisterEvents(1);
     
     // Create a window.
-    gSDLWindow = SDL_CreateWindow("ARToolKit6 Camera Calibration Utility",
+    gSDLWindow = SDL_CreateWindow("artoolkitX Camera Calibration Utility",
                                   SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                   1280, 720,
                                   SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI
@@ -441,7 +454,7 @@ int main(int argc, char *argv[])
                     }
                     
                     // Setup a route for rendering the colour background image.
-                    vv = new ARView;
+                    vv = new ARVideoView;
                     if (!vv) {
                         ARLOGe("Error: unable to create video view.\n");
                         quit(-1);
@@ -449,7 +462,7 @@ int main(int argc, char *argv[])
                     vv->setRotate90(contentRotate90);
                     vv->setFlipH(contentFlipH);
                     vv->setFlipV(contentFlipV);
-                    vv->setScalingMode(ARView::ScalingMode::SCALE_MODE_FIT);
+                    vv->setScalingMode(ARVideoView::ScalingMode::SCALE_MODE_FIT);
                     vv->initWithVideoSource(*vs, contextWidth, contextHeight);
                     ARLOGi("Content %dx%d (wxh) will display in GL context %dx%d%s.\n", vs->getVideoWidth(), vs->getVideoHeight(), contextWidth, contextHeight, (contentRotate90 ? " rotated" : ""));
                     vv->getViewport(gViewport);
@@ -548,14 +561,14 @@ static void quit(int rc)
 
 static void usage(char *com)
 {
-    ARLOG("Usage: %s [options]\n", com);
-    ARLOG("Options:\n");
-    ARLOG("  --vconf <video parameter for the camera>\n");
-    ARLOG("  -cornerx=n: specify the number of corners on chessboard in X direction.\n");
-    ARLOG("  -cornery=n: specify the number of corners on chessboard in Y direction.\n");
-    ARLOG("  -imagenum=n: specify the number of images captured for calibration.\n");
-    ARLOG("  -pattwidth=n: specify the square width in the chessbaord.\n");
-    ARLOG("  -h -help --help: show this message\n");
+    ARPRINT("Usage: %s [options]\n", com);
+    ARPRINT("Options:\n");
+    ARPRINT("  --vconf <video parameter for the camera>\n");
+    ARPRINT("  -cornerx=n: specify the number of corners on chessboard in X direction.\n");
+    ARPRINT("  -cornery=n: specify the number of corners on chessboard in Y direction.\n");
+    ARPRINT("  -imagenum=n: specify the number of images captured for calibration.\n");
+    ARPRINT("  -pattwidth=n: specify the square width in the chessbaord.\n");
+    ARPRINT("  -h -help --help: show this message\n");
     exit(0);
 }
 
@@ -575,7 +588,7 @@ static void init(int argc, char *argv[])
     
     arMalloc(cwd, char, MAXPATHLEN);
     if (!getcwd(cwd, MAXPATHLEN)) ARLOGe("Unable to read current working directory.\n");
-    else ARLOG("Current working directory is '%s'\n", cwd);
+    else ARPRINT("Current working directory is '%s'\n", cwd);
     
     i = 1; // argv[0] is name of app, so start at 1.
     while (i < argc) {
@@ -593,7 +606,7 @@ static void init(int argc, char *argv[])
             if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-help") == 0 || strcmp(argv[i], "-h") == 0) {
                 usage(argv[0]);
             } else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-version") == 0 || strcmp(argv[i], "-v") == 0) {
-                ARLOG("%s version %s\n", argv[0], AR_HEADER_VERSION_STRING);
+                ARPRINT("%s version %s\n", argv[0], AR_HEADER_VERSION_STRING);
                 exit(0);
             } else if( strncmp(argv[i], "-cornerx=", 9) == 0 ) {
                 if( sscanf(&(argv[i][9]), "%d", &chessboardCornerNumX) != 1 ) usage(argv[0]);
@@ -618,11 +631,11 @@ static void init(int argc, char *argv[])
     if( chessboardCornerNumY == 0 ) chessboardCornerNumY = CHESSBOARD_CORNER_NUM_Y;
     if( calibImageNum == 0 )        calibImageNum = CALIB_IMAGE_NUM;
     if( patternWidth == 0.0f )       patternWidth = (float)CHESSBOARD_PATTERN_WIDTH;
-    ARLOG("CHESSBOARD_CORNER_NUM_X = %d\n", chessboardCornerNumX);
-    ARLOG("CHESSBOARD_CORNER_NUM_Y = %d\n", chessboardCornerNumY);
-    ARLOG("CHESSBOARD_PATTERN_WIDTH = %f\n", patternWidth);
-    ARLOG("CALIB_IMAGE_NUM = %d\n", calibImageNum);
-    ARLOG("Video parameter: %s\n", vconf);
+    ARPRINT("CHESSBOARD_CORNER_NUM_X = %d\n", chessboardCornerNumX);
+    ARPRINT("CHESSBOARD_CORNER_NUM_Y = %d\n", chessboardCornerNumY);
+    ARPRINT("CHESSBOARD_PATTERN_WIDTH = %f\n", patternWidth);
+    ARPRINT("CALIB_IMAGE_NUM = %d\n", calibImageNum);
+    ARPRINT("Video parameter: %s\n", vconf);
     
 */
 

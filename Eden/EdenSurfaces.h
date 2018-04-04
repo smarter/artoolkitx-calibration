@@ -42,8 +42,8 @@
 
 /*!
     @header EdenSurfaces
-    @abstract Texture loading, selection, and drawing.
-    @discussion
+    @brief Texture loading, selection, and drawing.
+    @details
         EdenSurfaces forms one part of the Eden library.
     @copyright 2001-2013 Philip Lamb
  */
@@ -54,7 +54,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	
+
 /* ============================================================================ *
  *	Includes
  * ============================================================================ */
@@ -70,7 +70,7 @@ extern "C" {
 #    include <GL3/gl3.h>
 #  endif
 #elif EDEN_USE_GLES2
-#  if defined ANDROID
+#  ifndef EDEN_IPHONEOS
 #    include <GLES2/gl2.h>
 #    include <GLES2/gl2ext.h>
 #  else
@@ -101,7 +101,7 @@ extern "C" {
 
 /*!
     @typedef
-    @abstract Scaling mode to use when drawing a texture on a quad.
+    @brief Scaling mode to use when drawing a texture on a quad.
     @constant STRETCH Match texture size to quad, stretching as necessary.
     @constant FILL Scale the texture so that its smallest side exactly fills
         the largest side of the quad. If the texture and the quad are not the same
@@ -122,7 +122,7 @@ typedef enum {
 
 /*!
      @typedef
-     @abstract How to align the texture content when drawing a texture on a quad.
+     @brief How to align the texture content when drawing a texture on a quad.
  */
 typedef enum {
     CENTRE,
@@ -175,9 +175,8 @@ typedef struct {
  * ============================================================================ */
 
 /*!
-    @function
-    @abstract Initialise the EdenSurfaces library.
-    @discussion
+    @brief Initialise the EdenSurfaces library.
+    @details
         This function must be called prior to any other EdenSurfaces*() functions being called.
  
         Does NOT require that a valid OpenGL context be available.
@@ -188,9 +187,8 @@ typedef struct {
 EDEN_BOOL EdenSurfacesInit(const int contextsActiveCount, const int textureIndicesMax);
 
 /*!
-    @function
-    @abstract Loads textures into OpenGL texture objects.
-    @discussion
+    @brief Loads textures into OpenGL texture objects.
+    @details
         Loads numTextures textures into OpenGL texture objects, for the specified OpenGL
         context (the first context has a contextIndex of 0).
     @param contextIndex The index of the OpenGL context into which this texture is being loaded.
@@ -222,9 +220,8 @@ EDEN_BOOL EdenSurfacesTextureLoad(const int contextIndex, const int numTextures,
 EDEN_BOOL EdenSurfacesTextureLoad2(const int contextIndex, const int numTextures, const TEXTURE_INFO_t *textureInfo, TEXTURE_INDEX_t *textureIndices, char *hasAlpha_out, const EDEN_BOOL flipH, const EDEN_BOOL flipV);
 
 /*!
-    @function
-    @abstract Binds the OpenGL texture.
-    @discussion
+    @brief Binds the OpenGL texture.
+    @details
     @param textureIndex The texture bound is specified by parameter textureIndex.
         This index is only valid if the current OpenGL context is contextIndex, and the index
         was returned by EdenSurfacesTextureLoad() with the same OpenGL context.
@@ -235,9 +232,8 @@ EDEN_BOOL EdenSurfacesTextureLoad2(const int contextIndex, const int numTextures
 void EdenSurfacesTextureSet(const int contextIndex, TEXTURE_INDEX_t textureIndex);
 
 /*!
-    @function
-    @abstract Unloads textures and frees OpenGL texture objects.
-    @discussion
+    @brief Unloads textures and frees OpenGL texture objects.
+    @details
         Unloads numTextures textures from OpenGL texture objects, for the specified OpenGL context.
     @param numTextures The number of textures being unloaded.
     @param textureIndices After unloading, the corresponding index in textureIndices for each
@@ -250,9 +246,8 @@ void EdenSurfacesTextureSet(const int contextIndex, TEXTURE_INDEX_t textureIndex
 EDEN_BOOL EdenSurfacesTextureUnload(const int contextIndex, const int numTextures, TEXTURE_INDEX_t *textureIndices);
 
 /*!
-    @function
-    @abstract Finalise the EdenSurfaces library.
-    @discussion 
+    @brief Finalise the EdenSurfaces library.
+    @details 
         This function should be called once no more calls to any other EdenSurfaces*()
         functions are required, to free up allocated memory.
         Does NOT require that a valid OpenGL context be available.
@@ -261,9 +256,8 @@ EDEN_BOOL EdenSurfacesTextureUnload(const int contextIndex, const int numTexture
 EDEN_BOOL EdenSurfacesFinal(void);
 
 /*!
-    @function
-    @abstract Draw a texture on a quad using OpenGL.
-    @discussion
+    @brief Draw a texture on a quad using OpenGL.
+    @details
         Draws the texture pointed to by index on a surface of size (width, height) OpenGL units,
         with the lower-left corner of the surface at the origin, and the surface lying in the X-Y plane.
  
@@ -280,9 +274,8 @@ EDEN_BOOL EdenSurfacesDraw(const int contextIndex, const TEXTURE_INDEX_t texture
 EDEN_BOOL EdenSurfacesDraw2(const int contextIndex, const TEXTURE_INDEX_t textureIndex, const int width, const int height, const float S0, const float S1, const float T0, const float T1);
 
 /*!
-    @function
-    @abstract   Check for the availability of an OpenGL extension.
-    @discussion
+    @brief   Check for the availability of an OpenGL extension.
+    @details
         Provides the same functionality as the gluCheckExtension() function,
         since some platforms don't have GLU version 1.3 or later.
     @param      extName Name of the extension, e.g. "GL_EXT_texture".
@@ -292,9 +285,8 @@ EDEN_BOOL EdenSurfacesDraw2(const int contextIndex, const TEXTURE_INDEX_t textur
 GLboolean EdenGluCheckExtension(const GLubyte* extName, const GLubyte *extString);
 
 /*!
-    @function
-    @abstract   Checks for the presence of an OpenGL capability by version or extension.
-    @discussion
+    @brief   Checks for the presence of an OpenGL capability by version or extension.
+    @details
         Checks for the presence of an OpenGL capability by version or extension.
         The test returns true if EITHER the OpenGL driver's OpenGL implementation
         version meets or exceeds a minimum value (passed in in minVersion) OR

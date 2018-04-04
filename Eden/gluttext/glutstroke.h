@@ -14,7 +14,7 @@
 #    include <GL3/gl3.h>
 #  endif
 #elif EDEN_USE_GLES2
-#  if defined ANDROID
+#  ifndef EDEN_IPHONEOS
 #    include <GLES2/gl2.h>
 #    include <GLES2/gl2ext.h>
 #  else

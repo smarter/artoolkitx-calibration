@@ -17,7 +17,7 @@
 
 #if USE_GL_STATE_CACHE
 
-#if defined ANDROID
+#ifndef EDEN_IPHONEOS
 #  include <GLES/gl.h>
 #  include <GLES/glext.h>
 #else
