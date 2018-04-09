@@ -278,7 +278,7 @@ bool Calibration::uncaptureAll(void)
 
 void Calibration::calib(ARParam *param_out, ARdouble *err_min_out, ARdouble *err_avg_out, ARdouble *err_max_out)
 {
-    calc((int)m_corners.size(), m_patternType, m_patternSize, m_chessboardSquareWidth, m_corners, m_videoWidth, m_videoHeight, param_out, err_min_out, err_avg_out, err_max_out);
+    calc((int)m_corners.size(), m_patternType, m_patternSize, m_chessboardSquareWidth, m_corners, m_videoWidth, m_videoHeight, AR_DIST_FUNCTION_VERSION_DEFAULT, param_out, err_min_out, err_avg_out, err_max_out);
 }
 
 Calibration::~Calibration()
