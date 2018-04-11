@@ -89,7 +89,7 @@
 {
     [super viewDidLoad];
     
-    self.cameraResPresets = [NSArray arrayWithObjects:@"cif", @"480p" /*@"vga"*/, @"720p", @"1080p", @"low", @"medium", @"high", nil];
+    self.cameraResPresets = [NSArray arrayWithObjects:@"cif", @"480p" /*@"vga"*/, @"720p", @"1080p", @"low", @"medium", @"high", @"photo", nil];
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
