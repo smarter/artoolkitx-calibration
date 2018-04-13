@@ -8,7 +8,7 @@
 #
 
 #
-# Packages required: libjpeg-dev libopencv-calib3d-dev libssl-dev libcurl4-openssl-dev
+# Packages required: libjpeg-dev libopencv-calib3d-dev libssl-dev libcurl4-openssl-dev libconfig-dev
 #
 
 cmake_minimum_required( VERSION 3.2 )
@@ -28,10 +28,25 @@ project("artoolkitx_calib_camera"
 set(ARTOOLKITX_HOME "${CMAKE_CURRENT_SOURCE_DIR}/../../artoolkitx")
 set(ARTOOLKITX_CAMERA_CALIBRATION_HOME "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
-list(APPEND CMAKE_FIND_ROOT_PATH "${ARTOOLKITX_HOME}/Source/depends/linux")
-list(APPEND CMAKE_FIND_ROOT_PATH "${ARTOOLKITX_CAMERA_CALIBRATION_HOME}/depends/linux")
+add_definitions("-DARX_TARGET_PLATFORM_LINUX=1")
 
-add_definitions("-DTARGET_PLATFORM_LINUX=1")
+if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    add_definitions("-DDEBUG=1")
+endif()
+
+# Search prefix.
+list(APPEND CMAKE_MODULE_PATH "${ARTOOLKITX_HOME}/Source/cmake")
+if(ARX_TARGET_PLATFORM_VARIANT)
+    list(APPEND CMAKE_FIND_ROOT_PATH "${ARTOOLKITX_HOME}/Source/depends/linux-${ARX_TARGET_PLATFORM_VARIANT}")
+    list(APPEND CMAKE_FIND_ROOT_PATH "${ARTOOLKITX_CAMERA_CALIBRATION_HOME}/depends/linux-${ARX_TARGET_PLATFORM_VARIANT}")
+else()
+    list(APPEND CMAKE_FIND_ROOT_PATH "${ARTOOLKITX_HOME}/Source/depends/linux")
+    list(APPEND CMAKE_FIND_ROOT_PATH "${ARTOOLKITX_CAMERA_CALIBRATION_HOME}/depends/linux")
+endif()
+if ("${ARX_TARGET_PLATFORM_VARIANT}" STREQUAL "raspbian")
+    list(APPEND CMAKE_FIND_ROOT_PATH "/opt/vc/")
+    set(GL_PREFER_EMBEDDED 1)
+endif()
 
 # Installation settings.
 # If the user didn't define CMAKE_INSTALL_PREFIX, set a local install destination.
@@ -47,13 +62,26 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include_directories(${ARTOOLKITX_CAMERA_CALIBRATION_HOME})
 
-find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
-
 find_package(SDL2 REQUIRED)
-include(${SDL2_DIR}/sdl2-config.cmake)
-string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
-include_directories(${SDL2_INCLUDE_DIRS})
+string(STRIP "${SDL2_LIBRARY}" SDL2_LIBRARY)
+include_directories(${SDL2_INCLUDE_DIR})
+if ("${ARX_TARGET_PLATFORM_VARIANT}" STREQUAL "raspbian")
+    list(APPEND SDL2_LIBRARY -Wl,--no-undefined -lm -L/opt/vc/lib -lbcm_host -ldl -ldl -lpthread -lrt)
+endif()
+
+find_package(OpenGL)
+find_package(OpenGLES2)
+find_package(OpenGL3)
+if ((OPENGL_FOUND OR OpenGL3_FOUND) AND OPENGLES2_FOUND)
+    if(GL_PREFER_EMBEDDED)
+        set(OPENGL_FOUND 0)
+        set(OpenGL3_FOUND 0)
+        message(STATUS "Opting for embedded OpenGL")
+    else()
+        set(OPENGLES2_FOUND 0)
+        message(STATUS "Opting for desktop OpenGL. Set GL_PREFER_EMBEDDED to change.")
+    endif()
+endif()
 
 find_package(JPEG REQUIRED)
 include_directories(${JPEG_INCLUDE_DIR})
@@ -145,8 +173,7 @@ add_dependencies(${CMAKE_PROJECT_NAME}
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
     ARX
-    ${OPENGL_LIBRARIES}
-    ${SDL2_LIBRARIES}
+    ${SDL2_LIBRARY}
     ${JPEG_LIBRARIES}
     ${OPENCV_CALIB3D_LIBRARY} ${OPENCV_FEATURES2D_LIBRARY} ${OPENCV_IMGPROC_LIBRARY} ${OPENCV_FLANN_LIBRARY} ${OPENCV_CORE_LIBRARY}
     ${CURL_LIBRARIES} ${OPENSSL_LIBRARIES}
@@ -154,6 +181,19 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     pthread
     m
 )
+
+if(OPENGL_FOUND)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${OPENGL_INCLUDE_DIR})
+    target_link_libraries(${CMAKE_PROJECT_NAME} ${OPENGL_LIBRARIES})
+endif()
+if(OPENGLES2_FOUND)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${OPENGLES2_INCLUDE_DIR})
+    target_link_libraries(${CMAKE_PROJECT_NAME} ${OPENGLES2_LIBRARIES})
+endif()
+if(OpenGL3_FOUND)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${OpenGL3_INCLUDE_PATH})
+    target_link_libraries(${CMAKE_PROJECT_NAME} ${OpenGL3_LIBRARIES})
+endif()
 
 get_directory_property(ARXCC_DEFINES DIRECTORY ${CMAKE_SOURCE_DIR} COMPILE_DEFINITIONS)
 foreach(d ${ARXCC_DEFINES})

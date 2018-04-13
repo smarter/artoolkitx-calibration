@@ -40,7 +40,11 @@
  *
  */
 
-#include <SDL2/SDL.h>
+#ifdef __APPLE__
+#  include <SDL2/SDL.h>
+#else
+#  include "SDL2/SDL.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
