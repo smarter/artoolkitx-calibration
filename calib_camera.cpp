@@ -1054,26 +1054,23 @@ void drawView(void)
     // Setup for drawing on screen, with correct orientation for user.
     //
     glViewport(0, 0, contextWidth, contextHeight);
-#if !HAVE_GLES2
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-#else
-    mtxLoadIdentityf(p);
-#endif // !HAVE_GLES2
     bottom = 0.0f;
     top = (float)contextHeight;
     left = 0.0f;
     right = (float)contextWidth;
 #if !HAVE_GLES2
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
     glOrtho(left, right, bottom, top, -1.0f, 1.0f);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 #else
+    mtxLoadIdentityf(p);
     mtxOrthof(p, left, right, bottom, top, -1.0f, 1.0f);
     mtxLoadIdentityf(m);
-#endif // !HAVE_GLES2
     glUseProgram(program);
     glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEW_PROJECTION_MATRIX], 1, GL_FALSE, p);
+#endif // !HAVE_GLES2
 
     EdenGLFontSetViewSize(right, top);
     EdenMessageSetViewSize(right, top);
