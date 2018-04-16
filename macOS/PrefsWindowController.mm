@@ -289,7 +289,7 @@ static NSString *const kCalibrationPatternTypeAsymmetricCirclesStr = @"Asymmetri
             NSURL *dirURL = [[openDlg URLs] objectAtIndex:0];
             NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
             [defaults setObject:dirURL.path forKey:kSettingCalibSaveDir];
-            calibSaveDirLabel.stringValue = dirURL.lastPathComponent;
+            self->calibSaveDirLabel.stringValue = dirURL.lastPathComponent;
         }
     }];
 }

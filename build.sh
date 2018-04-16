@@ -22,7 +22,7 @@ VERSION=`sed -En -e 's/.*VERSION_STRING[[:space:]]+"([0-9]+\.[0-9]+(\.[0-9]+)*)"
 VERSION=`echo -n "${VERSION}" | sed -E -e 's/([0-9]+\.[0-9]+)\.0/\1/'`
 
 function usage {
-    echo "Usage: $(basename $0) (macos | linux)... "
+    echo "Usage: $(basename $0) [--debug] (macos | windows | linux | linux-raspbian)... "
     exit 1
 }
 
@@ -31,7 +31,10 @@ if [ $# -eq 0 ]; then
 fi
 
 # -e = exit on errors; -x = debug
-set -e -x
+set -e
+
+# -x = debug
+#set -x
 
 # Parse parameters
 while test $# -gt 0
@@ -45,6 +48,12 @@ do
             ;;
         linux) BUILD_LINUX=1
             ;;
+        linux-raspbian) BUILD_LINUX_RASPBIAN=1
+            ;;
+        windows) BUILD_WINDOWS=1
+            ;;
+        --debug) DEBUG=
+            ;;
         --*) echo "bad option $1"
             usage
             ;;
@@ -55,7 +64,6 @@ do
     shift
 done
 
-
 # Set OS-dependent variables.
 OS=`uname -s`
 ARCH=`uname -m`
@@ -64,12 +72,25 @@ if [ "$OS" = "Linux" ]
 then
     CPUS=`/usr/bin/nproc`
     TAR='/bin/tar'
+    # Identify Linux OS. Sets useful variables: ID, ID_LIKE, VERSION, NAME, PRETTY_NAME.
+    source /etc/os-release
+    # Windows Subsystem for Linux identifies itself as 'Linux'. Additional test required.
+    if grep -qE "(Microsoft|WSL)" /proc/version &> /dev/null ; then
+        OS='Windows'
+    fi
 elif [ "$OS" = "Darwin" ]
 then
     CPUS=`/usr/sbin/sysctl -n hw.ncpu`
 elif [ "$OS" = "CYGWIN_NT-6.1" ]
 then
+    # bash on Cygwin.
     CPUS=`/usr/bin/nproc`
+    OS='Windows'
+elif [ "$OS" = "MINGW64_NT-10.0" ]
+then
+    # git-bash on Windows.
+    CPUS=`/usr/bin/nproc`
+    OS='Windows'
 else
     CPUS=1
 fi
@@ -184,6 +205,45 @@ if [ $BUILD_LINUX ] ; then
 fi
 # /BUILD_LINUX
 
+# Linux
+if [ $BUILD_LINUX_RASPBIAN ] ; then
+    (cd Linux
+	mkdir -p build-raspbian
+	cd build-raspbian
+	cmake .. -DCMAKE_BUILD_TYPE=Release -DARX_TARGET_PLATFORM_VARIANT="raspbian" -DVERSION="${VERSION}"
+    make
+	make install
+    )
+
+fi
+# /BUILD_LINUX_RASPBIAN
+
 fi
 # /Linux
 
+if [ "$OS" = "Windows" ] ; then
+# ======================================================================
+#  Build platforms hosted by Windows
+# ======================================================================
+
+# Windows
+if [ $BUILD_WINDOWS ] ; then
+
+    if [ ! -d "build-windows" ] ; then
+        mkdir build-windows
+    fi
+
+    SDK_FILENAME="artoolkitX for Windows v${SDK_VERSION_PRETTY}.dmg"
+    curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
+
+    (cd Windows
+    mkdir -p build
+    cd build
+    cmake.exe .. -DCMAKE_CONFIGURATION_TYPES=${DEBUG+Debug}${DEBUG-Release} "-GVisual Studio 15 2017 Win64"  -D"VERSION=${VERSION}"
+    cmake.exe --build . --config ${DEBUG+Debug}${DEBUG-Release}  --target install
+    )
+fi
+# /BUILD_WINDOWS
+
+fi
+# /Windows

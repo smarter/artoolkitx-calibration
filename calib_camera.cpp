@@ -52,11 +52,6 @@
 #  include <sys/param.h> // MAXPATHLEN
 #  include <unistd.h> // getcwd
 #endif
-#ifdef __APPLE__
-#  include <OpenGL/gl.h>
-#elif defined(__linux) || defined(_WIN32)
-#  include <GL/gl.h>
-#endif
 #include <ARX/AR/ar.h>
 //#include <ARX/ARVideo/video.h>
 #include <ARX/ARVideoSource.h>
@@ -66,6 +61,9 @@
 #include <ARX/ARUtil/time.h>
 #include <ARX/ARUtil/file_utils.h>
 #include <ARX/ARG/arg.h>
+#include <ARX/ARG/mtx.h>
+#include <ARX/ARG/shader_gl.h>
+#include <ARX/ARG/glStateCache2.h>
 
 #include "fileUploader.h"
 #include "Calibration.hpp"
@@ -78,6 +76,20 @@
 
 #include "calib_camera.h"
 
+#ifdef __APPLE__
+#  if (HAVE_GL || HAVE_GL3)
+#    include <SDL2/SDL_opengl.h>
+#  elif HAVE_GLES2
+#    include <SDL2/SDL_opengles2.h>
+#  endif
+#else
+#  if (HAVE_GL || HAVE_GL3)
+#    include "SDL2/SDL_opengl.h"
+#  elif HAVE_GLES2
+#    include "SDL2/SDL_opengles2.h"
+#  endif
+#endif
+
 // ============================================================================
 //	Types
 // ============================================================================
@@ -85,6 +97,20 @@
 // ============================================================================
 //	Constants
 // ============================================================================
+
+#if HAVE_GLES2
+// Indices of GL ES program uniforms.
+enum {
+    UNIFORM_MODELVIEW_PROJECTION_MATRIX,
+    UNIFORM_COLOR,
+    UNIFORM_COUNT
+};
+// Indices of of GL ES program attributes.
+enum {
+    ATTRIBUTE_VERTEX,
+    ATTRIBUTE_COUNT
+};
+#endif // HAVE_GLES2
 
 #define      CHESSBOARD_CORNER_NUM_X        7
 #define      CHESSBOARD_CORNER_NUM_Y        5
@@ -161,6 +187,7 @@ static bool gCameraIsFrontFacing = false;
 static long gFrameCount = 0;
 
 // Window and GL context.
+static ARG_API drawAPI = ARG_API_None;
 static SDL_GLContext gSDLContext = NULL;
 static int contextWidth = 0;
 static int contextHeight = 0;
@@ -169,6 +196,10 @@ static SDL_Window* gSDLWindow = NULL;
 static int32_t gViewport[4] = {0, 0, 0, 0}; // {x, y, width, height}
 static int gDisplayOrientation = 1; // range [0-3]. 1=landscape.
 static float gDisplayDPI = 72.0f;
+#if HAVE_GLES2
+static GLint uniforms[UNIFORM_COUNT] = {0};
+static GLuint program = 0;
+#endif // HAVE_GLES2
 
 // Main state.
 static struct timeval gStartTime;
@@ -332,17 +363,55 @@ int main(int argc, char *argv[])
         quit(-1);
     }
     
-    // Create an OpenGL context to draw into.
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
+    // Create an OpenGL context to draw into. If OpenGL 3.2 not available, attempt to fall back to OpenGL 1.5, then OpenGL ES 2.0
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1); // This is the default.
     SDL_GL_SetSwapInterval(1);
-    gSDLContext = SDL_GL_CreateContext(gSDLWindow);
-    if (!gSDLContext) {
-        ARLOGe("Error creating OpenGL context: %s.\n", SDL_GetError());
-        return -1;
+#if HAVE_GL3
+//    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+//    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+//    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+//    gSDLContext = SDL_GL_CreateContext(gSDLWindow);
+//    if (gSDLContext) {
+//        drawAPI = ARG_API_GL3;
+//        ARLOGi("Created OpenGL 3.2+ context.\n");
+//    } else {
+//        ARLOGi("Unable to create OpenGL 3.2 context: %s. Will try OpenGL 1.5.\n", SDL_GetError());
+#endif // HAVE_GL3
+#if HAVE_GL
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
+        gSDLContext = SDL_GL_CreateContext(gSDLWindow);
+        if (gSDLContext) {
+            drawAPI = ARG_API_GL;
+            ARLOGi("Created OpenGL 1.5+ context.\n");
+        } else {
+            ARLOGi("Unable to create OpenGL 1.5 context: %s. Will try OpenGL ES 2.0\n", SDL_GetError());
+#endif // HAVE_GL
+#if HAVE_GLES2
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+            gSDLContext = SDL_GL_CreateContext(gSDLWindow);
+            if (gSDLContext) {
+                drawAPI = ARG_API_GLES2;
+                ARLOGi("Created OpenGL ES 2.0+ context.\n");
+            } else {
+                ARLOGi("Unable to create OpenGL ES 2.0 context: %s.\n", SDL_GetError());
+            }
+#endif // HAVE_GLES2
+#if HAVE_GL
+        }
+#endif
+#if HAVE_GL3
+//    }
+#endif
+    if (drawAPI == ARG_API_None) {
+        ARLOGe("No OpenGL context available. Giving up.\n", SDL_GetError());
+        quit(-1);
     }
+
     int w, h;
     SDL_GL_GetDrawableSize(SDL_GL_GetCurrentWindow(), &w, &h);
     reshape(w, h);
@@ -373,11 +442,74 @@ int main(int argc, char *argv[])
     EdenMessageInit(contextsActiveCount);
     EdenGLFontInit(contextsActiveCount);
     EdenGLFontSetFont(EDEN_GL_FONT_ID_Stroke_Roman);
+    EdenGLFontSetupFontForContext(0, EDEN_GL_FONT_ID_Stroke_Roman);
     EdenGLFontSetSize(FONT_SIZE);
     
     // Get start time.
     gettimeofday(&gStartTime, NULL);
     
+#if HAVE_GLES2
+    if (drawAPI == ARG_API_GLES2 && !program) {
+        GLuint vertShader = 0, fragShader = 0;
+        // A simple shader pair which accepts just a vertex position. Fixed color, no lighting.
+        const char vertShaderString[] =
+        "attribute vec4 position;\n"
+        "uniform vec4 color;\n"
+        "uniform mat4 modelViewProjectionMatrix;\n"
+        
+        "varying vec4 colorVarying;\n"
+        "void main()\n"
+        "{\n"
+        "gl_Position = modelViewProjectionMatrix * position;\n"
+        "colorVarying = color;\n"
+        "}\n";
+        const char fragShaderString[] =
+        "#ifdef GL_ES\n"
+        "precision mediump float;\n"
+        "#endif\n"
+        "varying vec4 colorVarying;\n"
+        "void main()\n"
+        "{\n"
+        "gl_FragColor = colorVarying;\n"
+        "}\n";
+        
+        if (program) arglGLDestroyShaders(0, 0, program);
+        program = glCreateProgram();
+        if (!program) {
+            ARLOGe("draw: Error creating shader program.\n");
+            quit(-1);
+        }
+        
+        if (!arglGLCompileShaderFromString(&vertShader, GL_VERTEX_SHADER, vertShaderString)) {
+            ARLOGe("draw: Error compiling vertex shader.\n");
+            arglGLDestroyShaders(vertShader, fragShader, program);
+            program = 0;
+            quit(-1);
+        }
+        if (!arglGLCompileShaderFromString(&fragShader, GL_FRAGMENT_SHADER, fragShaderString)) {
+            ARLOGe("draw: Error compiling fragment shader.\n");
+            arglGLDestroyShaders(vertShader, fragShader, program);
+            program = 0;
+            quit(-1);
+        }
+        glAttachShader(program, vertShader);
+        glAttachShader(program, fragShader);
+        
+        glBindAttribLocation(program, ATTRIBUTE_VERTEX, "position");
+        if (!arglGLLinkProgram(program)) {
+            ARLOGe("draw: Error linking shader program.\n");
+            arglGLDestroyShaders(vertShader, fragShader, program);
+            program = 0;
+            quit(-1);
+        }
+        arglGLDestroyShaders(vertShader, fragShader, 0); // After linking, shader objects can be deleted.
+        
+        // Retrieve linked uniform locations.
+        uniforms[UNIFORM_MODELVIEW_PROJECTION_MATRIX] = glGetUniformLocation(program, "modelViewProjectionMatrix");
+        uniforms[UNIFORM_COLOR] = glGetUniformLocation(program, "color");
+    }
+#endif // HAVE_GLES2
+
     startVideo();
     
     // Main loop.
@@ -642,12 +774,17 @@ static void init(int argc, char *argv[])
 static void drawBackground(const float width, const float height, const float x, const float y, const bool drawBorder)
 {
     GLfloat vertices[4][2];
-    
+#if HAVE_GLES2
+    GLfloat colorBlack50[4] = {0.0f, 0.0f, 0.0f, 0.5f}; // 50% transparent black.
+    GLfloat colorWhite[4] = {1.0f, 1.0f, 1.0f, 1.0f}; // Opaque white.
+#endif // HAVE_GLES2
+
     vertices[0][0] = x; vertices[0][1] = y;
     vertices[1][0] = width + x; vertices[1][1] = y;
     vertices[2][0] = width + x; vertices[2][1] = height + y;
     vertices[3][0] = x; vertices[3][1] = height + y;
     
+#if !HAVE_GLES2
     glLoadIdentity();
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
@@ -659,19 +796,35 @@ static void drawBackground(const float width, const float height, const float x,
     glDisableClientState(GL_NORMAL_ARRAY);
     glClientActiveTexture(GL_TEXTURE0);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glColor4f(0.0f, 0.0f, 0.0f, 0.5f);	// 50% transparent black.
+    glColor4f(0.0f, 0.0f, 0.0f, 0.5f);    // 50% transparent black.
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     if (drawBorder) {
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // Opaque white.
         glLineWidth(1.0f);
         glDrawArrays(GL_LINE_LOOP, 0, 4);
     }
+#else
+    glStateCacheDisableDepthTest();
+    glStateCacheBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glStateCacheEnableBlend();
+    
+    glVertexAttribPointer(ATTRIBUTE_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+    glEnableVertexAttribArray(ATTRIBUTE_VERTEX);
+    glUniform4fv(uniforms[UNIFORM_COLOR], 1, colorBlack50);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    if (drawBorder) {
+        glUniform4fv(uniforms[UNIFORM_COLOR], 1, colorWhite);
+        glLineWidth(1.0f);
+        glDrawArrays(GL_LINE_LOOP, 0, 4);
+    }
+#endif // !HAVE_GLES2
 }
 
 // An animation while we're waiting.
 // Designed to be drawn on background of at least 3xsquareSize wide and tall.
 static void drawBusyIndicator(int positionX, int positionY, int squareSize, struct timeval *tp)
 {
+#if !HAVE_GLES2
     const GLfloat square_vertices [4][2] = { {0.5f, 0.5f}, {squareSize - 0.5f, 0.5f}, {squareSize - 0.5f, squareSize - 0.5f}, {0.5f, squareSize - 0.5f} };
     int i;
     
@@ -718,10 +871,12 @@ static void drawBusyIndicator(int positionX, int positionY, int squareSize, stru
     }
     
     glPopMatrix();
+#endif // !HAVE_GLES2
 }
 
 void drawView(void)
 {
+    GLfloat p[16], m[16];
     int i;
     struct timeval time;
     float left, right, bottom, top;
@@ -763,9 +918,8 @@ void drawView(void)
         //
         // Setup for drawing on top of video frame, in video pixel coordinates.
         //
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        if (vv->rotate90()) glRotatef(90.0f, 0.0f, 0.0f, -1.0f);
+        mtxLoadIdentityf(p);
+        if (vv->rotate90()) mtxRotatef(p, 90.0f, 0.0f, 0.0f, -1.0f);
         if (vv->flipV()) {
             bottom = (float)vs->getVideoHeight();
             top = 0.0f;
@@ -780,23 +934,32 @@ void drawView(void)
             left = 0.0f;
             right = (float)vs->getVideoWidth();
         }
-        glOrtho(left, right, bottom, top, -1.0f, 1.0f);
+        mtxOrthof(p, left, right, bottom, top, -1.0f, 1.0f);
+        mtxLoadIdentityf(m);
+#if !HAVE_GLES2
+        glMatrixMode(GL_PROJECTION);
+        glLoadMatrixf(p);
         glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        glLoadMatrixf(m);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
         glDisable(GL_BLEND);
         glActiveTexture(GL_TEXTURE0);
         glDisable(GL_TEXTURE_2D);
-        
-        
+#else
+        glStateCacheDisableDepthTest();
+        glStateCacheDisableBlend();
+#endif // !HAVE_GLES2
+
         // Draw the crosses marking the corner positions.
+        const float colorRed[4] = {1.0f, 0.0f, 0.0f, 1.0f};
+        const float colorGreen[4] = {0.0f, 1.0f, 0.0f, 1.0f};
         vertexCount = (GLint)corners.size()*4;
         if (vertexCount > 0) {
             float fontSizeScaled = FONT_SIZE * (float)vs->getVideoHeight()/(float)(gViewport[(gDisplayOrientation % 2) == 1 ? 3 : 2]);
-            float colorRed[4] = {1.0f, 0.0f, 0.0f, 1.0f};
-            float colorGreen[4] = {0.0f, 1.0f, 0.0f, 1.0f};
+#if !HAVE_GLES2
             glColor4fv(cornerFoundAllFlag ? colorRed : colorGreen);
+#endif // !HAVE_GLES2
             EdenGLFontSetSize(fontSizeScaled);
             EdenGLFontSetColor(cornerFoundAllFlag ? colorRed : colorGreen);
             arMalloc(vertices, GLfloat, vertexCount*2); // 2 coords per vertex.
@@ -813,12 +976,23 @@ void drawView(void)
                 unsigned char buf[12]; // 10 digits in INT32_MAX, plus sign, plus null.
                 sprintf((char *)buf, "%d\n", i);
                 
+                GLfloat mvp[16];
+#if !HAVE_GLES2
                 glPushMatrix();
                 glLoadIdentity();
                 glTranslatef(corners[i].x, vs->getVideoHeight() - corners[i].y, 0.0f);
                 glRotatef((float)(gDisplayOrientation - 1) * -90.0f, 0.0f, 0.0f, 1.0f); // Orient the text to the user.
-                EdenGLFontDrawLine(0, NULL, buf, 0.0f, 0.0f, H_OFFSET_VIEW_LEFT_EDGE_TO_TEXT_LEFT_EDGE, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE); // These alignment modes don't require setting of EdenGLFontSetViewSize().
+#else
+                mtxLoadMatrixf(mvp, p);
+                mtxMultMatrixf(mvp, m);
+                mtxTranslatef(mvp, corners[i].x, vs->getVideoHeight() - corners[i].y, 0.0f);
+                mtxRotatef(mvp, (float)(gDisplayOrientation - 1) * -90.0f, 0.0f, 0.0f, 1.0f); // Orient the text to the user.
+
+#endif // !HAVE_GLES2
+                EdenGLFontDrawLine(0, mvp, buf, 0.0f, 0.0f, H_OFFSET_VIEW_LEFT_EDGE_TO_TEXT_LEFT_EDGE, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE); // These alignment modes don't require setting of EdenGLFontSetViewSize().
+#if !HAVE_GLES2
                 glPopMatrix();
+#endif // !HAVE_GLES2
             }
             EdenGLFontSetSize(FONT_SIZE);
             float colorWhite[4] = {1.0f, 1.0f, 1.0f, 1.0f};;
@@ -828,11 +1002,23 @@ void drawView(void)
         gCalibration->cornerFinderResultsUnlock();
         
         if (vertexCount > 0) {
+#if !HAVE_GLES2
             glVertexPointer(2, GL_FLOAT, 0, vertices);
             glEnableClientState(GL_VERTEX_ARRAY);
             glDisableClientState(GL_NORMAL_ARRAY);
             glClientActiveTexture(GL_TEXTURE0);
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+#else
+            glUseProgram(program);
+            GLfloat mvp[16];
+            mtxLoadMatrixf(mvp, p);
+            mtxMultMatrixf(mvp, m);
+            glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEW_PROJECTION_MATRIX], 1, GL_FALSE, mvp);
+            glUniform4fv(uniforms[UNIFORM_COLOR], 1, cornerFoundAllFlag ? colorRed : colorGreen);
+            
+            glVertexAttribPointer(ATTRIBUTE_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+            glEnableVertexAttribArray(ATTRIBUTE_VERTEX);
+#endif // !HAVE_GLES2
             glLineWidth(2.0f);
             glDrawArrays(GL_LINES, 0, vertexCount);
             free(vertices);
@@ -861,16 +1047,23 @@ void drawView(void)
     // Setup for drawing on screen, with correct orientation for user.
     //
     glViewport(0, 0, contextWidth, contextHeight);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
     bottom = 0.0f;
     top = (float)contextHeight;
     left = 0.0f;
     right = (float)contextWidth;
-    glOrtho(left, right, bottom, top, -1.0f, 1.0f);
+    mtxLoadIdentityf(p);
+    mtxOrthof(p, left, right, bottom, top, -1.0f, 1.0f);
+    mtxLoadIdentityf(m);
+#if !HAVE_GLES2
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(p);
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    
+    glLoadMatrixf(m);
+#else
+    glUseProgram(program);
+    glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEW_PROJECTION_MATRIX], 1, GL_FALSE, p);
+#endif // !HAVE_GLES2
+
     EdenGLFontSetViewSize(right, top);
     EdenMessageSetViewSize(right, top);
     EdenMessageSetBoxParams(600.0f, 20.0f);
@@ -880,7 +1073,7 @@ void drawView(void)
     if (statusBarMessage[0]) {
         drawBackground(right, statusBarHeight, 0.0f, 0.0f, false);
         glDisable(GL_BLEND);
-        EdenGLFontDrawLine(0, NULL, statusBarMessage, 0.0f, 2.0f, H_OFFSET_VIEW_CENTER_TO_TEXT_CENTER, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE);
+        EdenGLFontDrawLine(0, p, statusBarMessage, 0.0f, 2.0f, H_OFFSET_VIEW_CENTER_TO_TEXT_CENTER, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE);
     }
     
     // If background tasks are proceeding, draw a status box.
@@ -897,12 +1090,12 @@ void drawView(void)
             y = statusBarHeight + 2.0f;
             drawBackground(w, h, x, y, true);
             if (status == 1) drawBusyIndicator((int)(x + 4.0f + 1.5f*squareSize), (int)(y + 4.0f + 1.5f*squareSize), squareSize, &time);
-            EdenGLFontDrawLine(0, NULL, (unsigned char *)uploadStatus, x + 4.0f + 3*squareSize, y + (h - FONT_SIZE)/2.0f, H_OFFSET_VIEW_LEFT_EDGE_TO_TEXT_LEFT_EDGE, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE);
+            EdenGLFontDrawLine(0, p, (unsigned char *)uploadStatus, x + 4.0f + 3*squareSize, y + (h - FONT_SIZE)/2.0f, H_OFFSET_VIEW_LEFT_EDGE_TO_TEXT_LEFT_EDGE, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE);
         }
     }
     
     // If a message should be onscreen, draw it.
-    if (gEdenMessageDrawRequired) EdenMessageDraw(0, NULL);
+    if (gEdenMessageDrawRequired) EdenMessageDraw(0, p);
     
     SDL_GL_SwapWindow(gSDLWindow);
 }

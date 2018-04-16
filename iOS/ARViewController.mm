@@ -662,11 +662,11 @@ static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, 
     }
 }
 
-#if 0
 // An animation while we're waiting.
 // Designed to be drawn on background of at least 3xsquareSize wide and tall.
-- (void) drawBusyIndicator(int positionX, int positionY, int squareSize, struct timeval *tp)
+- (void) drawBusyIndicatorPositionX:(int)positionX positionY:(int)positionY squareSize:(int)squareSize tp:(struct timeval *)tp
 {
+#if 0
     const GLfloat square_vertices [4][2] = { {0.5f, 0.5f}, {squareSize - 0.5f, 0.5f}, {squareSize - 0.5f, squareSize - 0.5f}, {0.5f, squareSize - 0.5f} };
     int i;
     
@@ -713,8 +713,8 @@ static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, 
     }
     
     glPopMatrix();
-}
 #endif
+}
 
 - (void)tearDownGL
 {
@@ -1027,7 +1027,7 @@ static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, 
             x = right - (w + 2.0f);
             y = statusBarHeight + 2.0f;
             [self drawBackgroundWidth:w height:h x:x y:y border:true projection:p];
-            //        if (status == 1) drawBusyIndicator((int)(x + 4.0f + 1.5f*squareSize), (int)(y + 4.0f + 1.5f*squareSize), squareSize, &time);
+            if (status == 1) [self drawBusyIndicatorPositionX:(int)(x + 4.0f + 1.5f*squareSize) positionY:(int)(y + 4.0f + 1.5f*squareSize) squareSize:squareSize tp:&time];
             EdenGLFontDrawLine(0, p, (unsigned char *)uploadStatus, x + 4.0f + 3*squareSize, y + (h - FONT_SIZE)/2.0f, H_OFFSET_VIEW_LEFT_EDGE_TO_TEXT_LEFT_EDGE, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE);
         }
     }
