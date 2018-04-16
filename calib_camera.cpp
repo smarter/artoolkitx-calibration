@@ -876,9 +876,7 @@ static void drawBusyIndicator(int positionX, int positionY, int squareSize, stru
 
 void drawView(void)
 {
-#if HAVE_GLES2
     GLfloat p[16], m[16];
-#endif // !HAVE_GLES2
     int i;
     struct timeval time;
     float left, right, bottom, top;
@@ -920,14 +918,8 @@ void drawView(void)
         //
         // Setup for drawing on top of video frame, in video pixel coordinates.
         //
-#if !HAVE_GLES2
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        if (vv->rotate90()) glRotatef(90.0f, 0.0f, 0.0f, -1.0f);
-#else
         mtxLoadIdentityf(p);
         if (vv->rotate90()) mtxRotatef(p, 90.0f, 0.0f, 0.0f, -1.0f);
-#endif // !HAVE_GLES2
         if (vv->flipV()) {
             bottom = (float)vs->getVideoHeight();
             top = 0.0f;
@@ -942,18 +934,19 @@ void drawView(void)
             left = 0.0f;
             right = (float)vs->getVideoWidth();
         }
+        mtxOrthof(p, left, right, bottom, top, -1.0f, 1.0f);
+        mtxLoadIdentityf(m);
 #if !HAVE_GLES2
-        glOrtho(left, right, bottom, top, -1.0f, 1.0f);
+        glMatrixMode(GL_PROJECTION);
+        glLoadMatrixf(p);
         glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
+        glLoadMatrixf(m);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
         glDisable(GL_BLEND);
         glActiveTexture(GL_TEXTURE0);
         glDisable(GL_TEXTURE_2D);
 #else
-        mtxOrthof(p, left, right, bottom, top, -1.0f, 1.0f);
-        mtxLoadIdentityf(m);
         glStateCacheDisableDepthTest();
         glStateCacheDisableBlend();
 #endif // !HAVE_GLES2
@@ -983,20 +976,20 @@ void drawView(void)
                 unsigned char buf[12]; // 10 digits in INT32_MAX, plus sign, plus null.
                 sprintf((char *)buf, "%d\n", i);
                 
+                GLfloat mvp[16];
 #if !HAVE_GLES2
                 glPushMatrix();
                 glLoadIdentity();
                 glTranslatef(corners[i].x, vs->getVideoHeight() - corners[i].y, 0.0f);
                 glRotatef((float)(gDisplayOrientation - 1) * -90.0f, 0.0f, 0.0f, 1.0f); // Orient the text to the user.
 #else
-                GLfloat mvp[16];
                 mtxLoadMatrixf(mvp, p);
                 mtxMultMatrixf(mvp, m);
                 mtxTranslatef(mvp, corners[i].x, vs->getVideoHeight() - corners[i].y, 0.0f);
                 mtxRotatef(mvp, (float)(gDisplayOrientation - 1) * -90.0f, 0.0f, 0.0f, 1.0f); // Orient the text to the user.
 
 #endif // !HAVE_GLES2
-                EdenGLFontDrawLine(0, NULL, buf, 0.0f, 0.0f, H_OFFSET_VIEW_LEFT_EDGE_TO_TEXT_LEFT_EDGE, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE); // These alignment modes don't require setting of EdenGLFontSetViewSize().
+                EdenGLFontDrawLine(0, mvp, buf, 0.0f, 0.0f, H_OFFSET_VIEW_LEFT_EDGE_TO_TEXT_LEFT_EDGE, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE); // These alignment modes don't require setting of EdenGLFontSetViewSize().
 #if !HAVE_GLES2
                 glPopMatrix();
 #endif // !HAVE_GLES2
@@ -1058,16 +1051,15 @@ void drawView(void)
     top = (float)contextHeight;
     left = 0.0f;
     right = (float)contextWidth;
-#if !HAVE_GLES2
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(left, right, bottom, top, -1.0f, 1.0f);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-#else
     mtxLoadIdentityf(p);
     mtxOrthof(p, left, right, bottom, top, -1.0f, 1.0f);
     mtxLoadIdentityf(m);
+#if !HAVE_GLES2
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(p);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(m);
+#else
     glUseProgram(program);
     glUniformMatrix4fv(uniforms[UNIFORM_MODELVIEW_PROJECTION_MATRIX], 1, GL_FALSE, p);
 #endif // !HAVE_GLES2
@@ -1081,7 +1073,7 @@ void drawView(void)
     if (statusBarMessage[0]) {
         drawBackground(right, statusBarHeight, 0.0f, 0.0f, false);
         glDisable(GL_BLEND);
-        EdenGLFontDrawLine(0, NULL, statusBarMessage, 0.0f, 2.0f, H_OFFSET_VIEW_CENTER_TO_TEXT_CENTER, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE);
+        EdenGLFontDrawLine(0, p, statusBarMessage, 0.0f, 2.0f, H_OFFSET_VIEW_CENTER_TO_TEXT_CENTER, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE);
     }
     
     // If background tasks are proceeding, draw a status box.
@@ -1098,12 +1090,12 @@ void drawView(void)
             y = statusBarHeight + 2.0f;
             drawBackground(w, h, x, y, true);
             if (status == 1) drawBusyIndicator((int)(x + 4.0f + 1.5f*squareSize), (int)(y + 4.0f + 1.5f*squareSize), squareSize, &time);
-            EdenGLFontDrawLine(0, NULL, (unsigned char *)uploadStatus, x + 4.0f + 3*squareSize, y + (h - FONT_SIZE)/2.0f, H_OFFSET_VIEW_LEFT_EDGE_TO_TEXT_LEFT_EDGE, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE);
+            EdenGLFontDrawLine(0, p, (unsigned char *)uploadStatus, x + 4.0f + 3*squareSize, y + (h - FONT_SIZE)/2.0f, H_OFFSET_VIEW_LEFT_EDGE_TO_TEXT_LEFT_EDGE, V_OFFSET_VIEW_BOTTOM_TO_TEXT_BASELINE);
         }
     }
     
     // If a message should be onscreen, draw it.
-    if (gEdenMessageDrawRequired) EdenMessageDraw(0, NULL);
+    if (gEdenMessageDrawRequired) EdenMessageDraw(0, p);
     
     SDL_GL_SwapWindow(gSDLWindow);
 }
