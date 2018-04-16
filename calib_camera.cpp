@@ -1134,54 +1134,54 @@ static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, 
         
     } else {
         
-        bool goodWrite = true;
-
         // Get main device identifier and focal length from video module.
         char *device_id = NULL;
+        char *name = NULL;
         char *focal_length = NULL;
         
         AR2VideoParamT *vid = vs->getAR2VideoParam();
         if (ar2VideoGetParams(vid, AR_VIDEO_PARAM_DEVICEID, &device_id) < 0 || !device_id) {
             ARLOGe("Error fetching camera device identification.\n");
-            goodWrite = false;
+        }
+        if (ar2VideoGetParams(vid, AR_VIDEO_PARAM_NAME, &name) < 0 || !name) {
+            ARLOGe("Error fetching camera name.\n");
         }
         
-        if (goodWrite) {
-            if (vid->module == AR_VIDEO_MODULE_AVFOUNDATION) {
-                int focalPreset;
-                ar2VideoGetParami(vid, AR_VIDEO_PARAM_AVFOUNDATION_FOCUS_PRESET, &focalPreset);
-                switch (focalPreset) {
-                    case AR_VIDEO_AVFOUNDATION_FOCUS_MACRO:
-                        focal_length = strdup("0.01");
-                        break;
-                    case AR_VIDEO_AVFOUNDATION_FOCUS_0_3M:
-                        focal_length = strdup("0.3");
-                        break;
-                    case AR_VIDEO_AVFOUNDATION_FOCUS_1_0M:
-                        focal_length = strdup("1.0");
-                        break;
-                    case AR_VIDEO_AVFOUNDATION_FOCUS_INF:
-                        focal_length = strdup("1000000.0");
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if (!focal_length) {
-                // Not known at present, so just send 0.000.
-                focal_length = strdup("0.000");
+        if (vid->module == AR_VIDEO_MODULE_AVFOUNDATION) {
+            int focalPreset;
+            ar2VideoGetParami(vid, AR_VIDEO_PARAM_AVFOUNDATION_FOCUS_PRESET, &focalPreset);
+            switch (focalPreset) {
+                case AR_VIDEO_AVFOUNDATION_FOCUS_MACRO:
+                    focal_length = strdup("0.01");
+                    break;
+                case AR_VIDEO_AVFOUNDATION_FOCUS_0_3M:
+                    focal_length = strdup("0.3");
+                    break;
+                case AR_VIDEO_AVFOUNDATION_FOCUS_1_0M:
+                    focal_length = strdup("1.0");
+                    break;
+                case AR_VIDEO_AVFOUNDATION_FOCUS_INF:
+                    focal_length = strdup("1000000.0");
+                    break;
+                default:
+                    break;
             }
         }
+        if (!focal_length) {
+            // Not known at present, so just send 0.000.
+            focal_length = strdup("0.000");
+        }
         
-        if (goodWrite && gCalibrationSave) {
+        if (gCalibrationSave) {
             
             // Assemble the filename.
             char calibrationSavePathname[SAVEPARAM_PATHNAME_LEN];
             snprintf(calibrationSavePathname, SAVEPARAM_PATHNAME_LEN, "%s/camera_para-", gCalibrationSaveDir);
             size_t len = strlen(calibrationSavePathname);
             int i = 0;
-            while (device_id[i] && (len + i + 2 < SAVEPARAM_PATHNAME_LEN)) {
-                calibrationSavePathname[len + i] = (device_id[i] == '/' || device_id[i] == '\\' ? '_' : device_id[i]);
+            const char *identifier = (device_id ? device_id : (name ? name : ""));
+            while (identifier[i] && (len + i + 2 < SAVEPARAM_PATHNAME_LEN)) {
+                calibrationSavePathname[len + i] = (identifier[i] == '/' || identifier[i] == '\\' ? '_' : identifier[i]);
                 i++;
             }
             calibrationSavePathname[len + i] = '\0';
@@ -1203,7 +1203,7 @@ static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, 
         }
 
         // Check for early exit.
-        if (!goodWrite || !gCalibrationServerUploadURL) {
+        if (!gCalibrationServerUploadURL || !device_id) {
             if (remove(paramPathname) < 0) {
                 ARLOGe("Error removing temporary file '%s'.\n", paramPathname);
                 ARLOGperror(NULL);
@@ -1220,6 +1220,7 @@ static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, 
         // Open the file.
         snprintf(indexPathname, SAVEPARAM_PATHNAME_LEN, "%s/%s/%06d-index", arUtilGetResourcesDirectoryPath(AR_UTIL_RESOURCES_DIRECTORY_BEHAVIOR_USE_APP_CACHE_DIR), QUEUE_DIR, ID);
         FILE *fp;
+        bool goodWrite = true;
         if (!(fp = fopen(indexPathname, "wb"))) {
             ARLOGe("Error opening upload index file '%s'.\n", indexPathname);
             goodWrite = false;
