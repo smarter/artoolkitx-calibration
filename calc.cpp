@@ -176,7 +176,7 @@ void calc(const int capturedImageNum,
         err_avg += err;
         if (err > err_max) err_max = err;
     }
-    err_avg /= (ARdouble)(capturedImageNum + 1);
+    err_avg /= (ARdouble)capturedImageNum;
     *err_min_out = err_min;
     *err_avg_out = err_avg;
     *err_max_out = err_max;
