@@ -22,7 +22,7 @@ VERSION=`sed -En -e 's/.*VERSION_STRING[[:space:]]+"([0-9]+\.[0-9]+(\.[0-9]+)*)"
 VERSION=`echo -n "${VERSION}" | sed -E -e 's/([0-9]+\.[0-9]+)\.0/\1/'`
 
 function usage {
-    echo "Usage: $(basename $0) [--debug] (macos | windows | linux | linux-raspbian)... "
+    echo "Usage: $(basename $0) [--debug] (macos | ios | windows | linux | linux-raspbian) "
     exit 1
 }
 
