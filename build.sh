@@ -136,7 +136,7 @@ if [ "$OS" = "Darwin" ] ; then
 if [ $BUILD_MACOS ] ; then
     
     # Fetch the ARX.framework from latest build into a location where Xcode will find it.
-    SDK_FILENAME="artoolkitX for macOS v${SDK_VERSION_PRETTY}.dmg"
+    SDK_FILENAME="artoolkitX.for.macOS.v${SDK_VERSION_PRETTY}.dmg"
     curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
     hdiutil attach "${SDK_FILENAME}" -noautoopen -quiet -mountpoint "SDK"
     rm -rf depends/macOS/Frameworks/ARX.framework
@@ -156,7 +156,7 @@ fi
 if [ $BUILD_IOS ] ; then
     
     # Fetch libARX from latest build into a location where Xcode will find it.
-    SDK_FILENAME="artoolkitX for iOS v${SDK_VERSION_PRETTY}.dmg"
+    SDK_FILENAME="artoolkitX.for.iOS.v${SDK_VERSION_PRETTY}.dmg"
     curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
     hdiutil attach "${SDK_FILENAME}" -noautoopen -quiet -mountpoint "SDK"
     rm -rf depends/iOS/include/ARX/
@@ -233,7 +233,7 @@ if [ $BUILD_WINDOWS ] ; then
         mkdir build-windows
     fi
 
-    SDK_FILENAME="artoolkitX for Windows v${SDK_VERSION_PRETTY}.dmg"
+    SDK_FILENAME="artoolkitX.for.Windows.v${SDK_VERSION_PRETTY}.dmg"
     curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
 
     (cd Windows
