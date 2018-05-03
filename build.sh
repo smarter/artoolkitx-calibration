@@ -12,7 +12,7 @@
 # Get our location.
 OURDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-SDK_VERSION='1.0.0'
+SDK_VERSION='1.0.1'
 # If the tiny version number is 0, drop it.
 SDK_VERSION_PRETTY=`echo -n "${SDK_VERSION}" | sed -E -e 's/([0-9]+\.[0-9]+)\.0/\1/'`
 SDK_URL_DIR="https://github.com/artoolkitx/artoolkitx/releases/download/${SDK_VERSION_PRETTY}/"

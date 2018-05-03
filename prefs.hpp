@@ -44,10 +44,6 @@
 // Data upload.
 #define CALIBRATION_PATTERN_TYPE_DEFAULT Calibration::CalibrationPatternType::CHESSBOARD
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void *initPreferences(void);
 void showPreferences(void *preferences);
 void preferencesFinal(void **preferences_p);
@@ -62,7 +58,4 @@ cv::Size getPreferencesCalibrationPatternSize(void *preferences);
 float getPreferencesCalibrationPatternSpacing(void *preferences);
 char *getPreferenceCalibSaveDir(void *preferences);
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* prefs_hpp */
