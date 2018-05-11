@@ -144,7 +144,8 @@ if [ $BUILD_MACOS ] ; then
     hdiutil detach "SDK" -quiet -force
     
     # Make the version number available to Xcode.
-    sed -E -i.bak "s/@VERSION@/${VERSION}/" macOS/user-config.xcconfig
+    cp macOS/user-config-in.xcconfig macOS/user-config.xcconfig
+    sed -E -i "s/@VERSION@/${VERSION}/" macOS/user-config.xcconfig
     
     (cd macOS
     xcodebuild -target "artoolkitX Camera Calibration Utility" -configuration Release
@@ -166,7 +167,8 @@ if [ $BUILD_IOS ] ; then
     hdiutil detach "SDK" -quiet -force
     
     # Make the version number available to Xcode.
-    sed -E -i.bak "s/@VERSION@/${VERSION}/" iOS/user-config.xcconfig
+    cp iOS/user-config-in.xcconfig iOS/user-config.xcconfig
+    sed -E -i "s/@VERSION@/${VERSION}/" iOS/user-config.xcconfig
     
     (cd iOS
     xcodebuild -target "artoolkitX Camera Calibration Utility" -configuration Release -destination generic/platform=iOS
@@ -185,14 +187,14 @@ if [ "$OS" = "Linux" ] ; then
 # Linux
 if [ $BUILD_LINUX ] ; then
     #Before we can install the artoolkitx-dev package we need to install the -lib. As -dev depends on -lib
-    SDK_FILENAME="artoolkitx-lib_${SDK_VERSION}_amd64.deb"
-    curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
-    sudo dpkg -i "${SDK_FILENAME}"
+    #SDK_FILENAME="artoolkitx-lib_${SDK_VERSION}_amd64.deb"
+    #curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
+    #sudo dpkg -i "${SDK_FILENAME}"
 
     # Fetch the artoolkitx-dev package and install it.
-    SDK_FILENAME="artoolkitx-dev_${SDK_VERSION}_amd64.deb"
-    curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
-    sudo dpkg -i "${SDK_FILENAME}"
+    #SDK_FILENAME="artoolkitx-dev_${SDK_VERSION}_amd64.deb"
+    #curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
+    #sudo dpkg -i "${SDK_FILENAME}"
 
     (cd Linux
 	mkdir -p build

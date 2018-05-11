@@ -8,7 +8,7 @@
 #
 
 #
-# Packages required: libjpeg-dev libopencv-calib3d-dev libssl-dev libcurl4-openssl-dev libconfig-dev
+# Packages required: artoolkitx-dev libjpeg-dev libopencv-calib3d-dev libssl-dev libcurl4-openssl-dev libconfig-dev
 #
 
 cmake_minimum_required( VERSION 3.2 )
@@ -139,6 +139,8 @@ set(SOURCE
     ../Eden/EdenTime.h
     ../Eden/EdenUtil.c
     ../Eden/EdenUtil.h
+    ../Eden/EdenUIInput.c
+    ../Eden/EdenUIInput.h
     ../Eden/glStateCache.c
     ../Eden/glStateCache.h
     ../Eden/gluttext.h
@@ -167,9 +169,9 @@ add_dependencies(${CMAKE_PROJECT_NAME}
     ARX
 )
 
-#set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-#    INSTALL_RPATH "\$ORIGIN/../lib"
-#)
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+    INSTALL_RPATH "\$ORIGIN"
+)
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
     ARX

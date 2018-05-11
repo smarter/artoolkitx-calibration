@@ -19,6 +19,7 @@
 		4A5FA0BD1DFE155D00795630 /* EdenUtil.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A5FA0BC1DFE155D00795630 /* EdenUtil.c */; };
 		4A6FD7281E42C7A900C6471A /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A6FD7271E42C7A900C6471A /* OpenCL.framework */; };
 		4A6FD72A1E42C7C200C6471A /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A6FD7291E42C7C200C6471A /* Accelerate.framework */; };
+		4A79ED8120A5247B0087591E /* EdenUIInput.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A79ED7F20A5247A0087591E /* EdenUIInput.c */; };
 		4A7FEB3E1E43F35E003783F7 /* libopencv_world.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A7FEB3D1E43F35E003783F7 /* libopencv_world.a */; };
 		4A7FEB401E43F3FF003783F7 /* libippicv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A7FEB3F1E43F3FF003783F7 /* libippicv.a */; };
 		4A7FEB421E43F422003783F7 /* libzlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A7FEB411E43F422003783F7 /* libzlib.a */; };
@@ -101,6 +102,8 @@
 		4A6223CF1E6CFBA8002F0096 /* prefsLibConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = prefsLibConfig.cpp; path = ../prefsLibConfig.cpp; sourceTree = "<group>"; };
 		4A6FD7271E42C7A900C6471A /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
 		4A6FD7291E42C7C200C6471A /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		4A79ED7F20A5247A0087591E /* EdenUIInput.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = EdenUIInput.c; sourceTree = "<group>"; };
+		4A79ED8020A5247B0087591E /* EdenUIInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EdenUIInput.h; sourceTree = "<group>"; };
 		4A7FEB3D1E43F35E003783F7 /* libopencv_world.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libopencv_world.a; sourceTree = "<group>"; };
 		4A7FEB3F1E43F3FF003783F7 /* libippicv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libippicv.a; sourceTree = "<group>"; };
 		4A7FEB411E43F422003783F7 /* libzlib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libzlib.a; sourceTree = "<group>"; };
@@ -782,6 +785,8 @@
 				4A9143581DF666E200DF4FEE /* EdenSurfaces.c */,
 				4A5FA0B91DFE13F500795630 /* EdenTime.h */,
 				4A5FA0BA1DFE140000795630 /* EdenTime.c */,
+				4A79ED8020A5247B0087591E /* EdenUIInput.h */,
+				4A79ED7F20A5247A0087591E /* EdenUIInput.c */,
 				4A5FA0BE1DFE156B00795630 /* EdenUtil.h */,
 				4A5FA0BC1DFE155D00795630 /* EdenUtil.c */,
 				4A5FA0B51DFE139F00795630 /* readtex.h */,
@@ -911,6 +916,7 @@
 				4A9143531DF6660700DF4FEE /* flow.cpp in Sources */,
 				4A5FA0B71DFE13B300795630 /* EdenMessage.c in Sources */,
 				4A9143791DF666E200DF4FEE /* glut_tr24.c in Sources */,
+				4A79ED8120A5247B0087591E /* EdenUIInput.c in Sources */,
 				4A5FA0BD1DFE155D00795630 /* EdenUtil.c in Sources */,
 				4A9143711DF666E200DF4FEE /* glut_hel10.c in Sources */,
 				4A9143721DF666E200DF4FEE /* glut_hel12.c in Sources */,

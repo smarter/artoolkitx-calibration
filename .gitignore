@@ -2,7 +2,9 @@ depends/ios/include/ARX/
 depends/ios/lib/libARX.a
 depends/macos/Frameworks/ARX.framework/
 Linux/build/
+iOS/user-config.xcconfig
 iOS/build/
+macOS/user-config.xcconfig
 macOS/build/
 xcuserdata/
 *.xcscmblueprint

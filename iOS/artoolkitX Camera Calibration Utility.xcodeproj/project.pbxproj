@@ -47,6 +47,7 @@
 		4A4793A51E80D85A002C3631 /* flow.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4A4793A41E80D85A002C3631 /* flow.mm */; };
 		4A4793CE1E80D945002C3631 /* EdenTime.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4793B21E80D945002C3631 /* EdenTime.c */; };
 		4A4793CF1E80D945002C3631 /* EdenUtil.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4793B41E80D945002C3631 /* EdenUtil.c */; };
+		4A79ED8420A5249C0087591E /* EdenUIInput.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A79ED8220A5249C0087591E /* EdenUIInput.c */; };
 		4ADE9C161E887B8500F04AC0 /* EdenMessage.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4793AE1E80D945002C3631 /* EdenMessage.c */; };
 		4ADE9C171E88863600F04AC0 /* EdenGLFont.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4793AB1E80D945002C3631 /* EdenGLFont.c */; };
 		4ADE9C181E8886AB00F04AC0 /* EdenSurfaces.c in Sources */ = {isa = PBXBuildFile; fileRef = 4A4793B01E80D945002C3631 /* EdenSurfaces.c */; };
@@ -149,6 +150,8 @@
 		4A4793C91E80D945002C3631 /* readtex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = readtex.c; sourceTree = "<group>"; };
 		4A4793CA1E80D945002C3631 /* readtex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = readtex.h; sourceTree = "<group>"; };
 		4A60A98F1EF367EF00BEBF8A /* user-config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "user-config.xcconfig"; sourceTree = "<group>"; };
+		4A79ED8220A5249C0087591E /* EdenUIInput.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = EdenUIInput.c; sourceTree = "<group>"; };
+		4A79ED8320A5249C0087591E /* EdenUIInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EdenUIInput.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -320,6 +323,8 @@
 				4A4793B11E80D945002C3631 /* EdenSurfaces.h */,
 				4A4793B21E80D945002C3631 /* EdenTime.c */,
 				4A4793B31E80D945002C3631 /* EdenTime.h */,
+				4A79ED8320A5249C0087591E /* EdenUIInput.h */,
+				4A79ED8220A5249C0087591E /* EdenUIInput.c */,
 				4A4793B41E80D945002C3631 /* EdenUtil.c */,
 				4A4793B51E80D945002C3631 /* EdenUtil.h */,
 				4A4793B81E80D945002C3631 /* gluttext */,
@@ -462,6 +467,7 @@
 				4A4793A01E80D195002C3631 /* fileUploader.c in Sources */,
 				4ADE9C1E1E8887CF00F04AC0 /* glut_hel10.c in Sources */,
 				4ADE9C1B1E8887CF00F04AC0 /* glut_9x15.c in Sources */,
+				4A79ED8420A5249C0087591E /* EdenUIInput.c in Sources */,
 				4A47936E1E80CF96002C3631 /* SettingsViewController.mm in Sources */,
 				4ADE9C201E8887CF00F04AC0 /* glut_hel18.c in Sources */,
 				4ADE9C171E88863600F04AC0 /* EdenGLFont.c in Sources */,

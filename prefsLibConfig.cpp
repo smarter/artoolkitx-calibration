@@ -217,7 +217,7 @@ void *showPreferencesThread(void *arg)
 #endif
                 "\n"
                 "Press [esc] to finish or type number and press [return] ";
-            EdenMessageInput((const unsigned char *)prompt, 1, 2, 1, 0, 0);
+            EdenMessageInput((const unsigned char *)prompt, 1, 2, true, false, false);
             inputa = EdenMessageInputGetInput();
             if (!inputa) state = PREFS_END;
             else if (!inputa[0] || sscanf((const char *)inputa, "%d", &inputi) < 1) {
@@ -245,7 +245,7 @@ void *showPreferencesThread(void *arg)
         } else if (state == PREFS_OPTION_HELP) {
             int ret = system("which xdg-open");
             if (ret != 0) {
-                EdenMessageInput((const unsigned char *)"Unable to open help (missing xdg-open command). Press [return] to continue. ", 0, 0, 0, 0, 0);
+                EdenMessageInput((const unsigned char *)"Unable to open help (missing xdg-open command). Press [return] to continue. ", 0, 0, false, false, false);
                 inputa = EdenMessageInputGetInput();
                 free(inputa);
             } else {
@@ -258,7 +258,7 @@ void *showPreferencesThread(void *arg)
                 ARLOGe("Unable to get ARVideoSourceInfoListT.\n");
                 state = PREFS_END;
             } else if (sil->count == 0) {
-                EdenMessageInput((const unsigned char *)"No video sources connected.\n\nPress [return] to continue.", 0, 1, 0, 0, 0);
+                EdenMessageInput((const unsigned char *)"No video sources connected.\n\nPress [return] to continue.", 0, 1, false, false, false);
                 state = PREFS_BEGIN;
             } else {
                 char prompt[4096] = "Preferences: Camera.\n\n";
@@ -274,7 +274,7 @@ void *showPreferencesThread(void *arg)
                 }
                 len = strlen(prompt);
                 snprintf(prompt + len, sizeof(prompt) - len, "\nCurrent value is %s.\n\nPress [esc] to leave unchanged, or type a number and press [return] ", (selectedItemIndex >= 0 ? sil->info[selectedItemIndex].name : "a camera not currently connected"));
-                EdenMessageInput((const unsigned char *)prompt, 1, 1, 1, 0, 0);
+                EdenMessageInput((const unsigned char *)prompt, 1, 2, true, false, false);
                 inputa = EdenMessageInputGetInput();
                 if (!inputa) state = PREFS_BEGIN;
                 else if (!inputa[0] || sscanf((const char *)inputa, "%d", &inputi) < 1 || inputi < 1 || inputi > sil->count) {
@@ -291,7 +291,7 @@ void *showPreferencesThread(void *arg)
             size_t len;
             len = strlen(prompt);
             snprintf(prompt + len, sizeof(prompt) - len, "Saving is %s.\n\nPress [esc] to leave unchanged, or press [return] to toggle ", (b ? "on" : "off"));
-            EdenMessageInput((const unsigned char *)prompt, 0, 0, 0, 0, 0);
+            EdenMessageInput((const unsigned char *)prompt, 0, 0, false, false, false);
             inputa = EdenMessageInputGetInput();
             if (!inputa) state = PREFS_BEGIN;
             else {
@@ -305,7 +305,7 @@ void *showPreferencesThread(void *arg)
             size_t len;
             len = strlen(prompt);
             snprintf(prompt + len, sizeof(prompt) - len, "Current value is '%s'.\n\nPress [esc] to leave unchanged, [return] to use default, or type new setting and press [return] ", s ? s : "");
-            EdenMessageInput((const unsigned char *)prompt, 0, 2048, 0, 0, 0);
+            EdenMessageInput((const unsigned char *)prompt, 0, 2048, false, false, false);
             inputa = EdenMessageInputGetInput();
             if (!inputa) state = PREFS_BEGIN;
             else {
@@ -326,7 +326,7 @@ void *showPreferencesThread(void *arg)
             size_t len;
             len = strlen(prompt);
             snprintf(prompt + len, sizeof(prompt) - len, "Upload is %s.\n\nPress [esc] to leave unchanged, or press [return] to toggle ", (b ? "on" : "off"));
-            EdenMessageInput((const unsigned char *)prompt, 0, 0, 0, 0, 0);
+            EdenMessageInput((const unsigned char *)prompt, 0, 0, false, false, false);
             inputa = EdenMessageInputGetInput();
             if (!inputa) state = PREFS_BEGIN;
             else {
@@ -341,7 +341,7 @@ void *showPreferencesThread(void *arg)
             size_t len;
             len = strlen(prompt);
             snprintf(prompt + len, sizeof(prompt) - len, "Current value is '%s'.\n\nPress [esc] to leave unchanged, [return] to use default, or type new setting and press [return] ", s ? s : "");
-            EdenMessageInput((const unsigned char *)prompt, 0, 2048, 0, 0, 0);
+            EdenMessageInput((const unsigned char *)prompt, 0, 2048, false, false, false);
             inputa = EdenMessageInputGetInput();
             if (!inputa) state = PREFS_BEGIN;
             else {
@@ -358,7 +358,7 @@ void *showPreferencesThread(void *arg)
             size_t len;
             len = strlen(prompt);
             snprintf(prompt + len, sizeof(prompt) - len, "Current value is '%s'.\n\nPress [esc] to leave unchanged, [return] to use default, or type new setting and press [return] ", s ? s : "");
-            EdenMessageInput((const unsigned char *)prompt, 0, 2048, 0, 0, 0);
+            EdenMessageInput((const unsigned char *)prompt, 0, 2048, false, false, false);
             inputa = EdenMessageInputGetInput();
             if (!inputa) state = PREFS_BEGIN;
             else {
@@ -376,7 +376,7 @@ void *showPreferencesThread(void *arg)
             size_t len;
             len = strlen(prompt);
             snprintf(prompt + len, sizeof(prompt) - len, "Current value is '%s'.\n\nPress [esc] to leave unchanged, or type a number and press [return] ", s ? s : "");
-            EdenMessageInput((const unsigned char *)prompt, 1, 1, 1, 0, 0);
+            EdenMessageInput((const unsigned char *)prompt, 1, 1, true, false, false);
             inputa = EdenMessageInputGetInput();
             if (!inputa) state = PREFS_BEGIN;
             else if (!inputa[0] || sscanf((const char *)inputa, "%d", &inputi) < 1) {
@@ -412,7 +412,7 @@ void *showPreferencesThread(void *arg)
             size_t len;
             len = strlen(prompt);
             snprintf(prompt + len, sizeof(prompt) - len, "Current size is %dx%d.\n\nPress [esc] to leave unchanged, or type new values and press [return] ", w, h);
-            EdenMessageInput((const unsigned char *)prompt, 1, 7, 0, 0, 0);
+            EdenMessageInput((const unsigned char *)prompt, 1, 7, false, false, false);
             inputa = EdenMessageInputGetInput();
             if (!inputa) state = PREFS_BEGIN;
             else if (!inputa[0] || sscanf((const char *)inputa, "%dx%d", &w, &h) < 2) {
@@ -431,7 +431,7 @@ void *showPreferencesThread(void *arg)
             size_t len;
             len = strlen(prompt);
             snprintf(prompt + len, sizeof(prompt) - len, "Current spacing is %.2f.\n\nPress [esc] to leave unchanged, or type new value and press [return] ", f);
-            EdenMessageInput((const unsigned char *)prompt, 1, 20, 0, 1, 0);
+            EdenMessageInput((const unsigned char *)prompt, 1, 20, false, true, false);
             inputa = EdenMessageInputGetInput();
             if (!inputa) state = PREFS_BEGIN;
             else if (!inputa[0] || sscanf((const char *)inputa, "%f", &f) < 1) {
