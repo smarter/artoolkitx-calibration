@@ -4,3 +4,4 @@
 //
 
 VERSION=@VERSION@
+GCC_PREPROCESSOR_DEFINITIONS=ARTOOLKITX_CSUU="\"https:\/\/calibration.artoolkitx.org\/app\/calib_camera\/upload.php\"" ARTOOLKITX_CSAT="\"auth_token\""

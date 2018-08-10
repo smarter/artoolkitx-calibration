@@ -29,6 +29,8 @@ set(ARTOOLKITX_HOME "${CMAKE_CURRENT_SOURCE_DIR}/../../artoolkitx")
 set(ARTOOLKITX_CAMERA_CALIBRATION_HOME "${CMAKE_CURRENT_SOURCE_DIR}/..")
 
 add_definitions("-DARX_TARGET_PLATFORM_LINUX=1")
+add_definitions("-DARTOOLKITX_CSUU=\"https://calibration.artoolkitx.org/app/calib_camera/upload.php\"")
+add_definitions("-DARTOOLKITX_CSAT=\"auth_token\"")
 
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
     add_definitions("-DDEBUG=1")
