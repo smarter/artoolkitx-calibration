@@ -41,8 +41,8 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/core/core_c.h>
 
-static ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_function_version);
-static void convParam(float intr[3][4], float dist[4], int xsize, int ysize, ARParam *param);
+static void convParam(const float intr[3][4], const float dist[AR_DIST_FACTOR_NUM_MAX], const int xsize, const int ysize, const int dist_function_version, ARParam *param);
+static ARdouble getSizeFactor(ARdouble const dist_factor[AR_DIST_FACTOR_NUM_MAX], const int xsize, const int ysize, const int dist_function_version);
 
 static void calcChessboardCorners(const Calibration::CalibrationPatternType patternType, cv::Size patternSize, float patternSpacing, std::vector<cv::Point3f>& corners)
 {
@@ -74,20 +74,28 @@ void calc(const int capturedImageNum,
 		  const std::vector<std::vector<cv::Point2f> >& cornerSet,
 		  const int width,
 		  const int height,
+          const int dist_function_version,
 		  ARParam *param_out,
 		  ARdouble *err_min_out,
 		  ARdouble *err_avg_out,
 		  ARdouble *err_max_out)
 {
-    int i, j, k;
+    if (dist_function_version != 5 && dist_function_version != 4) {
+        ARLOGe("Unsupported distortion function version %d.\n", dist_function_version);
+        return;
+    }
 
-    // Options.
+    // Set version.
     int flags = 0;
+    cv::Mat distortionCoeff;
+    if (dist_function_version == 5) {
+        distortionCoeff = cv::Mat::zeros(12, 1, CV_64F);
+        flags |= cv::CALIB_RATIONAL_MODEL|cv::CALIB_THIN_PRISM_MODEL;
+    } else /* dist_function_version == 4 */ {
+        distortionCoeff = cv::Mat::zeros(5, 1, CV_64F);
+        flags |= cv::CALIB_FIX_K3;
+    }
     double aspectRatio = 1.0;
-    //flags |= cv::CALIB_USE_INTRINSIC_GUESS;
-    //flags |= cv::CALIB_FIX_ASPECT_RATIO;
-    //flags |= cv::CALIB_FIX_PRINCIPAL_POINT;
-    //flags |= cv::CALIB_ZERO_TANGENT_DIST;
 
     // Set up object points.
     std::vector<std::vector<cv::Point3f> > objectPoints(1);
@@ -98,12 +106,11 @@ void calc(const int capturedImageNum,
     if (flags & cv::CALIB_FIX_ASPECT_RATIO)
        intrinsics.at<double>(0,0) = aspectRatio;
     
-    cv::Mat distortionCoeff = cv::Mat::zeros(4, 1, CV_64F);
     std::vector<cv::Mat> rotationVectors;
     std::vector<cv::Mat> translationVectors;
     
     double rms = calibrateCamera(objectPoints, cornerSet, cv::Size(width, height), intrinsics,
-                                 distortionCoeff, rotationVectors, translationVectors, flags|cv::CALIB_FIX_K3|cv::CALIB_FIX_K4|cv::CALIB_FIX_K5);
+                                 distortionCoeff, rotationVectors, translationVectors, flags);
     
     ARLOGi("RMS error reported by calibrateCamera: %g\n", rms);
     
@@ -112,8 +119,9 @@ void calc(const int capturedImageNum,
     
     
     float           intr[3][4];
-    float           dist[4];
+    float           dist[AR_DIST_FACTOR_NUM_MAX];
     ARParam         param;
+    int i, j, k;
 
     for (j = 0; j < 3; j++) {
         for (i = 0; i < 3; i++) {
@@ -121,10 +129,12 @@ void calc(const int capturedImageNum,
         }
         intr[j][3] = 0.0f;
     }
-    for (i = 0; i < 4; i++) {
-        dist[i] = (float)distortionCoeff.at<double>(i);
+    if (dist_function_version == 5) {
+        for (i = 0; i < 12; i++) dist[i] = (float)distortionCoeff.at<double>(i);
+    } else /* dist_function_version == 4 */ {
+        for (i = 0; i < 4; i++) dist[i] = (float)distortionCoeff.at<double>(i);
     }
-    convParam(intr, dist, width, height, &param);
+    convParam(intr, dist, width, height, dist_function_version, &param);
     arParamDisp(&param);
 
     CvMat          *rotationVector;
@@ -187,24 +197,45 @@ void calc(const int capturedImageNum,
     cvReleaseMat(&rotationMatrix);
 }
 
-void convParam(float intr[3][4], float dist[4], int xsize, int ysize, ARParam *param)
+static void convParam(const float intr[3][4], const float dist[AR_DIST_FACTOR_NUM_MAX], const int xsize, const int ysize, const int dist_function_version, ARParam *param)
 {
     double   s;
     int      i, j;
-
-	param->dist_function_version = 4;
+    
+    if (dist_function_version != 5 && dist_function_version != 4) {
+        ARLOGe("Unsupported distortion function version %d.\n", dist_function_version);
+        return;
+    }
+    
+	param->dist_function_version = dist_function_version;
     param->xsize = xsize;
     param->ysize = ysize;
 
-    param->dist_factor[0] = (ARdouble)dist[0];     /* k1  */
-    param->dist_factor[1] = (ARdouble)dist[1];     /* k2  */
-    param->dist_factor[2] = (ARdouble)dist[2];     /* p1  */
-    param->dist_factor[3] = (ARdouble)dist[3];     /* p2  */
-    param->dist_factor[4] = (ARdouble)intr[0][0];  /* fx  */
-    param->dist_factor[5] = (ARdouble)intr[1][1];  /* fy  */
-    param->dist_factor[6] = (ARdouble)intr[0][2];  /* x0  */
-    param->dist_factor[7] = (ARdouble)intr[1][2];  /* y0  */
-    param->dist_factor[8] = (ARdouble)1.0;         /* s   */
+    param->dist_factor[0] = (ARdouble)dist[0];         /* k1  */
+    param->dist_factor[1] = (ARdouble)dist[1];         /* k2  */
+    param->dist_factor[2] = (ARdouble)dist[2];         /* p1  */
+    param->dist_factor[3] = (ARdouble)dist[3];         /* p2  */
+    if (dist_function_version == 5) {
+        param->dist_factor[4] = (ARdouble)dist[4];     /* k3  */
+        param->dist_factor[5] = (ARdouble)dist[5];     /* k4  */
+        param->dist_factor[6] = (ARdouble)dist[6];     /* k5  */
+        param->dist_factor[7] = (ARdouble)dist[7];     /* k6  */
+        param->dist_factor[8] = (ARdouble)dist[8];     /* s1  */
+        param->dist_factor[9] = (ARdouble)dist[9];     /* s2  */
+        param->dist_factor[10] = (ARdouble)dist[10];   /* s3  */
+        param->dist_factor[11] = (ARdouble)dist[11];   /* s4  */
+        param->dist_factor[12] = (ARdouble)intr[0][0]; /* fx  */
+        param->dist_factor[13] = (ARdouble)intr[1][1]; /* fy  */
+        param->dist_factor[14] = (ARdouble)intr[0][2]; /* cx  */
+        param->dist_factor[15] = (ARdouble)intr[1][2]; /* cy  */
+        param->dist_factor[16] = (ARdouble)1.0;        /* s   */
+    } else /* dist_function_version == 4 */ {
+        param->dist_factor[4] = (ARdouble)intr[0][0];  /* fx  */
+        param->dist_factor[5] = (ARdouble)intr[1][1];  /* fy  */
+        param->dist_factor[6] = (ARdouble)intr[0][2];  /* cx  */
+        param->dist_factor[7] = (ARdouble)intr[1][2];  /* cy  */
+        param->dist_factor[8] = (ARdouble)1.0;         /* s   */
+    }
 
     for (j = 0; j < 3; j++) {
         for (i = 0; i < 4; i++) {
@@ -217,22 +248,38 @@ void convParam(float intr[3][4], float dist[4], int xsize, int ysize, ARParam *p
     param->mat[0][1] /= s;
     param->mat[1][0] /= s;
     param->mat[1][1] /= s;
-    param->dist_factor[8] = s;
+    if (dist_function_version == 5) {
+        param->dist_factor[16] = s;
+    } else /* dist_function_version == 4 */ {
+        param->dist_factor[8] = s;
+    }
 }
 
-ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_function_version)
+static ARdouble getSizeFactor(const ARdouble dist_factor[AR_DIST_FACTOR_NUM_MAX], const int xsize, const int ysize, const int dist_function_version)
 {
     ARdouble  ox, oy, ix, iy;
     ARdouble  olen, ilen;
     ARdouble  sf, sf1;
+    ARdouble  cx, cy;
+    
+    if (dist_function_version == 5) {
+        cx = dist_factor[14];
+        cy = dist_factor[15];
+    } else if (dist_function_version == 4) {
+        cx = dist_factor[6];
+        cy = dist_factor[7];
+    } else {
+        ARLOGe("Unsupported distortion function version %d.\n", dist_function_version);
+        return 1.0;
+    }
 
     sf = 100.0f;
 
     ox = 0.0f;
-    oy = dist_factor[7];
-    olen = dist_factor[6];
+    oy = cy;
+    olen = cx;
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
-    ilen = dist_factor[6] - ix;
+    ilen = cx - ix;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
@@ -240,32 +287,32 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     }
 
     ox = xsize;
-    oy = dist_factor[7];
-    olen = xsize - dist_factor[6];
+    oy = cy;
+    olen = xsize - cx;
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
-    ilen = ix - dist_factor[6];
+    ilen = ix - cx;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
     }
 
-    ox = dist_factor[6];
+    ox = cx;
     oy = 0.0;
-    olen = dist_factor[7];
+    olen = cy;
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
-    ilen = dist_factor[7] - iy;
+    ilen = cy - iy;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
     }
 
-    ox = dist_factor[6];
+    ox = cx;
     oy = ysize;
-    olen = ysize - dist_factor[7];
+    olen = ysize - cy;
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
-    ilen = iy - dist_factor[7];
+    ilen = iy - cy;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
@@ -276,15 +323,15 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     ox = 0.0f;
     oy = 0.0f;
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
-    ilen = dist_factor[6] - ix;
-    olen = dist_factor[6];
+    ilen = cx - ix;
+    olen = cx;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
     }
-    ilen = dist_factor[7] - iy;
-    olen = dist_factor[7];
+    ilen = cy - iy;
+    olen = cy;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
@@ -294,15 +341,15 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     ox = xsize;
     oy = 0.0f;
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
-    ilen = ix - dist_factor[6];
-    olen = xsize - dist_factor[6];
+    ilen = ix - cx;
+    olen = xsize - cx;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
     }
-    ilen = dist_factor[7] - iy;
-    olen = dist_factor[7];
+    ilen = cy - iy;
+    olen = cy;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
@@ -312,15 +359,15 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     ox = 0.0f;
     oy = ysize;
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
-    ilen = dist_factor[6] - ix;
-    olen = dist_factor[6];
+    ilen = cx - ix;
+    olen = cx;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
     }
-    ilen = iy - dist_factor[7];
-    olen = ysize - dist_factor[7];
+    ilen = iy - cy;
+    olen = ysize - cy;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
@@ -330,15 +377,15 @@ ARdouble getSizeFactor(ARdouble dist_factor[], int xsize, int ysize, int dist_fu
     ox = xsize;
     oy = ysize;
     arParamObserv2Ideal(dist_factor, ox, oy, &ix, &iy, dist_function_version);
-    ilen = ix - dist_factor[6];
-    olen = xsize - dist_factor[6];
+    ilen = ix - cx;
+    olen = xsize - cx;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
         if (sf1 < sf) sf = sf1;
     }
-    ilen = iy - dist_factor[7];
-    olen = ysize - dist_factor[7];
+    ilen = iy - cy;
+    olen = ysize - cy;
     //ARPRINT("Olen = %f, Ilen = %f, s = %f\n", olen, ilen, ilen / olen);
     if (ilen > 0.0f) {
         sf1 = ilen / olen;
