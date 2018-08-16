@@ -138,7 +138,9 @@ if [ $BUILD_MACOS ] ; then
     
     # Fetch the ARX.framework from latest build into a location where Xcode will find it.
     SDK_FILENAME="artoolkitX.for.macOS.v${SDK_VERSION_PRETTY}.dmg"
-    curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
+    if [ ! -f "${SDK_FILENAME}" ] ; then
+        curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
+    fi
     hdiutil attach "${SDK_FILENAME}" -noautoopen -quiet -mountpoint "SDK"
     rm -rf depends/macOS/Frameworks/ARX.framework
     cp -af SDK/artoolkitX/SDK/Frameworks/ARX.framework depends/macOS/Frameworks
@@ -146,7 +148,7 @@ if [ $BUILD_MACOS ] ; then
     
     # Make the version number available to Xcode.
     cp macOS/user-config-in.xcconfig macOS/user-config.xcconfig
-    sed -E -i "s/@VERSION@/${VERSION}/" macOS/user-config.xcconfig
+    sed -E -i "" -e "s/@VERSION@/${VERSION}/" macOS/user-config.xcconfig
     
     (cd macOS
     xcodebuild -target "artoolkitX Camera Calibration Utility" -configuration Release
@@ -159,7 +161,9 @@ if [ $BUILD_IOS ] ; then
     
     # Fetch libARX from latest build into a location where Xcode will find it.
     SDK_FILENAME="artoolkitX.for.iOS.v${SDK_VERSION_PRETTY}.dmg"
-    curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
+    if [ ! -f "${SDK_FILENAME}" ] ; then
+        curl -f -o "${SDK_FILENAME}" --location "${SDK_URL_DIR}$(rawurlencode "${SDK_FILENAME}")"
+    fi
     hdiutil attach "${SDK_FILENAME}" -noautoopen -quiet -mountpoint "SDK"
     rm -rf depends/iOS/include/ARX/
     cp -af SDK/artoolkitX/SDK/include/ARX depends/iOS/include
@@ -169,7 +173,7 @@ if [ $BUILD_IOS ] ; then
     
     # Make the version number available to Xcode.
     cp iOS/user-config-in.xcconfig iOS/user-config.xcconfig
-    sed -E -i "s/@VERSION@/${VERSION}/" iOS/user-config.xcconfig
+    sed -E -i "" -e "s/@VERSION@/${VERSION}/" iOS/user-config.xcconfig
     
     (cd iOS
     xcodebuild -target "artoolkitX Camera Calibration Utility" -configuration Release -destination generic/platform=iOS
