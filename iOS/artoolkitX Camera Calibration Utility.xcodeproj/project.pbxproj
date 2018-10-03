@@ -68,6 +68,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4A01554A21645B3D00FE1CE5 /* version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = version.h; path = ../version.h; sourceTree = "<group>"; };
+		4A01554B21645B3D00FE1CE5 /* readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = readme.md; path = ../readme.md; sourceTree = "<group>"; };
 		4A0AB67F1E81DA6900F6EBB9 /* ARViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARViewController.h; sourceTree = "<group>"; };
 		4A0AB6801E81DA6900F6EBB9 /* ARViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ARViewController.mm; sourceTree = "<group>"; };
 		4A0AB6821E81DFCE00F6EBB9 /* prefs.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = prefs.hpp; path = ../prefs.hpp; sourceTree = "<group>"; };
@@ -214,6 +216,7 @@
 			isa = PBXGroup;
 			children = (
 				4A60A98F1EF367EF00BEBF8A /* user-config.xcconfig */,
+				4A01554B21645B3D00FE1CE5 /* readme.md */,
 				4A4793611E80CF24002C3631 /* Source */,
 				4A47936F1E80CF9B002C3631 /* Resources */,
 				4A4793961E80D072002C3631 /* Dependencies */,
@@ -233,6 +236,7 @@
 		4A4793611E80CF24002C3631 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				4A01554A21645B3D00FE1CE5 /* version.h */,
 				4A47934D1E80CDBE002C3631 /* AppDelegate.h */,
 				4A47934E1E80CDBE002C3631 /* AppDelegate.m */,
 				4A0AB67F1E81DA6900F6EBB9 /* ARViewController.h */,

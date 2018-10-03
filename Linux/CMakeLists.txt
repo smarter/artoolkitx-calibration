@@ -113,6 +113,7 @@ include_directories(${ARTOOLKITX_HOME}/Source/depends/linux/include)
 include(${ARTOOLKITX_HOME}/SDK/lib/ARX/ARX.cmake)
 
 set(SOURCE
+    ../version.h
     ../calib_camera.cpp
     ../calib_camera.h
     ../Calibration.hpp

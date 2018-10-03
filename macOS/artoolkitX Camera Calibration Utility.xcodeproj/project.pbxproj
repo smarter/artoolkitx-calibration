@@ -80,6 +80,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4A01554821645AF900FE1CE5 /* version.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = version.h; path = ../version.h; sourceTree = "<group>"; };
+		4A01554921645AFA00FE1CE5 /* readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = readme.md; path = ../readme.md; sourceTree = "<group>"; };
 		4A0720F81E6637FE00084FB6 /* PrefsWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PrefsWindow.xib; sourceTree = "<group>"; };
 		4A0720FA1E663EBA00084FB6 /* PrefsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefsWindowController.h; sourceTree = "<group>"; };
 		4A0720FB1E663EBA00084FB6 /* PrefsWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PrefsWindowController.mm; sourceTree = "<group>"; };
@@ -346,6 +348,7 @@
 			isa = PBXGroup;
 			children = (
 				4A60A98E1EF3675000BEBF8A /* user-config.xcconfig */,
+				4A01554921645AFA00FE1CE5 /* readme.md */,
 				4A9142151DF6459900DF4FEE /* Source */,
 				4A91421E1DF6466A00DF4FEE /* Dependencies */,
 				4A9142141DF6453500DF4FEE /* Resources */,
@@ -376,6 +379,7 @@
 		4A9142151DF6459900DF4FEE /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				4A01554821645AF900FE1CE5 /* version.h */,
 				4A5FA0BF1DFE160500795630 /* calib_camera.h */,
 				4A9142181DF645A900DF4FEE /* calib_camera.cpp */,
 				4A47933C1E7F676E002C3631 /* Calibration.hpp */,
