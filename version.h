@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-#define VERSION_STRING "1.0.1"
+#define VERSION_STRING "1.0.3"
 
 #ifdef __cplusplus
 }

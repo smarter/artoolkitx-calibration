@@ -1161,6 +1161,9 @@ static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, 
             goodWrite = false;
         }
         
+        // Add a version to the request. "2" if sending a v5 distortion function file, "1" otherwise.
+        if (goodWrite) fprintf(fp, "version,%d\n", param->dist_function_version == 5 ? 2 : 1);
+        
         // File name.
         if (goodWrite) fprintf(fp, "file,%s\n", paramPathname);
         

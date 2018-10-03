@@ -343,9 +343,6 @@ static void *fileUploader(THREAD_HANDLE_T *threadHandle)
     			break;
     		}
 
-    		// Add a version to the request.
-			curl_formadd(&post, &last, CURLFORM_COPYNAME, "version", CURLFORM_COPYCONTENTS, "1", CURLFORM_END);
-
     	    curlErr = curl_easy_setopt(curlHandle, CURLOPT_HTTPPOST, post); // Automatically sets CURLOPT_NOBODY to 0.
     		if (curlErr != CURLE_OK) {
     			ARLOGe("Error setting CURL form data: %s (%d)\n", curl_easy_strerror(curlErr), curlErr);
