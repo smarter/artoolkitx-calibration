@@ -61,7 +61,9 @@
 //    }
 //
 
-#include <sys/time.h> // struct timeval, gettimeofday(), timeradd()
+#include "gettime.h"
+
+//#include <sys/time.h> // struct timeval, gettimeofday(), timeradd()
 #include <stdbool.h>
 
 #ifdef __cplusplus

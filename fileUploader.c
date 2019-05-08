@@ -43,7 +43,8 @@
 #include <stdbool.h>
 #include <curl/curl.h>
 #include <dirent.h> // opendir(), readdir(), closedir()
-#include <sys/param.h> // MAXPATHLEN
+//#include <sys/param.h> // MAXPATHLEN
+#define MAXPATHLEN 128
 #include <sys/stat.h> // struct stat, stat()
 #include <pthread.h>
 
@@ -137,7 +138,7 @@ FILE_UPLOAD_HANDLE_t *fileUploaderInit(const char *queueDirPath, const char *for
 
     // Convert float time delta in seconds to a struct timeval.
 	time_t secs = (time_t)statusHideAfterSecs;
-	suseconds_t usecs = (suseconds_t)((statusHideAfterSecs - (float)secs)*1000000.0f);
+	long usecs = (long)((statusHideAfterSecs - (float)secs)*1000000.0f);
     handle->uploadStatusHideAfterSecs.tv_sec = secs;
     handle->uploadStatusHideAfterSecs.tv_usec = usecs;
 

@@ -39,6 +39,8 @@
 #pragma once
 
 #include "Calibration.hpp"
+#include "asprintf.h"
+#include "gettime.h"
 
 extern unsigned char statusBarMessage[];
 
