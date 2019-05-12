@@ -234,14 +234,16 @@ static void *flowThread(void *arg)
 	flowStateSet(FLOW_STATE_WELCOME);
 
 	while (!gStop) {
-
+		ARLOGi("1\n");
 		if (flowStateGet() == FLOW_STATE_WELCOME) {
-			EdenMessageShow((const unsigned char *)"Welcome to artoolkitX Camera Calibrator\n(c)2018 Realmax, Inc. & (c)2017 DAQRI LLC.\n\nPress 'space' to begin a calibration run.\n\nPress 'p' for settings and help.");
+			ARLOGi((const char *)"Welcome to artoolkitX Camera Calibrator\n(c)2018 Realmax, Inc. & (c)2017 DAQRI LLC.\n\nPress 'space' to begin a calibration run.\n\nPress 'p' for settings and help.\n");
 		} else {
-			EdenMessageShow((const unsigned char *)"Press 'space' to begin a calibration run.\n\nPress 'p' for settings and help.");
+			ARLOGi((const char *)"Press 'space' to begin a calibration run.\n\nPress 'p' for settings and help.\n");
 		}
+		ARLOGi("2\n");
 		flowSetEventMask((EVENT_t)(EVENT_TOUCH | EVENT_MODAL));
 		event = flowWaitForEvent();
+		ARLOGi("3\n");
 		if (gStop) break;
         
         if (event == EVENT_MODAL) {
@@ -249,7 +251,7 @@ static void *flowThread(void *arg)
             event = flowWaitForEvent();
             continue;
         } else {
-            EdenMessageHide();
+            //EdenMessageHide();
         }
 
 		// Start capturing.
@@ -259,6 +261,7 @@ static void *flowThread(void *arg)
 
 		do {
 			snprintf((char *)statusBarMessage, STATUS_BAR_MESSAGE_BUFFER_LEN, "Capturing image %d/%d", gFlowCalib->calibImageCount() + 1, gFlowCalib->calibImageCountMax());
+			printf("Capturing image %d/%d\n", gFlowCalib->calibImageCount() + 1, gFlowCalib->calibImageCountMax());
 			event = flowWaitForEvent();
 			if (gStop) break;
 			if (event == EVENT_TOUCH) {
@@ -287,10 +290,10 @@ static void *flowThread(void *arg)
 
 			flowSetEventMask(EVENT_TOUCH);
             flowStateSet(FLOW_STATE_DONE);
-			EdenMessageShow((const unsigned char *)"Calibration canceled");
+			ARLOGi((const char *)"Calibration canceled\n");
 			flowWaitForEvent();
 			if (gStop) break;
-			EdenMessageHide();
+			//EdenMessageHide();
 
 		} else {
 			ARParam param;
@@ -298,9 +301,9 @@ static void *flowThread(void *arg)
 
 			flowSetEventMask(EVENT_NONE);
 			flowStateSet(FLOW_STATE_CALIBRATING);
-			EdenMessageShow((const unsigned char *)"Calculating camera parameters...");
+			ARLOGi((const char *)"Calculating camera parameters...\n");
 			gFlowCalib->calib(&param, &err_min, &err_avg, &err_max);
-    		EdenMessageHide();
+    		//EdenMessageHide();
 
             if (gCallback) (*gCallback)(&param, err_min, err_avg, err_max, gCallbackUserdata);
             gFlowCalib->uncaptureAll(); // prepare for next run.
@@ -310,11 +313,12 @@ static void *flowThread(void *arg)
 			flowStateSet(FLOW_STATE_DONE);
 			unsigned char *buf;
 			asprintf((char **)&buf, "Camera parameters calculated (error min=%.3f, avg=%.3f, max=%.3f)", err_min, err_avg, err_max);
+			printf("Camera parameters calculated (error min=%.3f, avg=%.3f, max=%.3f)\n", err_min, err_avg, err_max);
 			EdenMessageShow(buf);
 			free(buf);
 			flowWaitForEvent();
 			if (gStop) break;
-			EdenMessageHide();
+			//EdenMessageHide();
 
 		}
 

@@ -90,6 +90,7 @@
 #  endif
 #endif
 
+
 // ============================================================================
 //	Types
 // ============================================================================
@@ -157,7 +158,7 @@ static void *gPreferences = NULL;
 Uint32 gSDLEventPreferencesChanged = 0;
 static char *gPreferenceCameraOpenToken = NULL;
 static char *gPreferenceCameraResolutionToken = NULL;
-static bool gCalibrationSave = false;
+static bool gCalibrationSave = true;
 static char *gCalibrationSaveDir = NULL;
 static char *gCalibrationServerUploadURL = NULL;
 static char *gCalibrationServerAuthenticationToken = NULL;
@@ -219,11 +220,17 @@ static void drawView(void);
 //static void          usage(char *com);
 static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, ARdouble err_max, void *userdata);
 
+
+static PFNGLACTIVETEXTUREARBPROC glActiveTexture1 = NULL; //(PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
+static PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTexture1 = NULL;// (PFNGLCLIENTACTIVETEXTUREARBPROC)wglGetProcAddress("glClientActiveTextureARB");
+
 static void startVideo(void)
 {
     char buf[256];
-    snprintf(buf, sizeof(buf), "%s %s", (gPreferenceCameraOpenToken ? gPreferenceCameraOpenToken : ""), (gPreferenceCameraResolutionToken ? gPreferenceCameraResolutionToken : ""));
-    
+    //snprintf(buf, sizeof(buf), "%s %s", (gPreferenceCameraOpenToken ? gPreferenceCameraOpenToken : ""), (gPreferenceCameraResolutionToken ? gPreferenceCameraResolutionToken : ""));
+//	snprintf(buf, sizeof(buf), "-module=LeapMotion -no-deallocate");
+	snprintf(buf, sizeof(buf), "-module=LeapMotion -no-deallocate -stereo_part=right");
+
     vs = new ARVideoSource;
     if (!vs) {
         ARLOGe("Error: Unable to create video source.\n");
@@ -232,7 +239,7 @@ static void startVideo(void)
         vs->configure(buf, true, NULL, NULL, 0);
         if (!vs->open()) {
             ARLOGe("Error: Unable to open video source.\n");
-            EdenMessageShow((const unsigned char *)"Welcome to artoolkitX Camera Calibrator\n(c)2018 Realmax, Inc. & (c)2017 DAQRI LLC.\n\nUnable to open video source.\n\nPress 'p' for settings and help.");
+            ARLOGi((const char *)"Welcome to artoolkitX Camera Calibrator\n(c)2018 Realmax, Inc. & (c)2017 DAQRI LLC.\n\nUnable to open video source.\n\nPress 'p' for settings and help.");
         }
     }
     gPostVideoSetupDone = false;
@@ -412,11 +419,18 @@ int main(int argc, char *argv[])
         quit(-1);
     }
 
+	glActiveTexture1 = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
+	if (glActiveTexture1 == NULL)
+		printf("broken glActiveTexture\n");
+	glClientActiveTexture1 = (PFNGLCLIENTACTIVETEXTUREARBPROC)wglGetProcAddress("glClientActiveTextureARB");
+	if (glClientActiveTexture1 == NULL)
+		printf("broken glClientActiveTexture\n");
+
     int w, h;
     SDL_GL_GetDrawableSize(SDL_GL_GetCurrentWindow(), &w, &h);
     reshape(w, h);
     
-    asprintf(&gFileUploadQueuePath, "%s/%s", arUtilGetResourcesDirectoryPath(AR_UTIL_RESOURCES_DIRECTORY_BEHAVIOR_USE_APP_CACHE_DIR), QUEUE_DIR);
+    asprintf(&gFileUploadQueuePath, "%s\\%s", arUtilGetResourcesDirectoryPath(AR_UTIL_RESOURCES_DIRECTORY_BEHAVIOR_USE_APP_CACHE_DIR), QUEUE_DIR);
     // Check for QUEUE_DIR and create if not already existing.
     if (!fileUploaderCreateQueueDir(gFileUploadQueuePath)) {
         ARLOGe("Error: Could not create queue directory.\n");
@@ -546,6 +560,7 @@ int main(int argc, char *argv[])
         }
         
         if (vs->isOpen()) {
+			//printf("Get frame.\n");
             if (vs->captureFrame()) {
                 gFrameCount++; // Increment ARToolKit FPS counter.
 #ifdef DEBUG
@@ -794,7 +809,7 @@ static void drawBackground(const float width, const float height, const float x,
     glVertexPointer(2, GL_FLOAT, 0, vertices);
     glEnableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
-    glClientActiveTexture(GL_TEXTURE0);
+    glClientActiveTexture1(GL_TEXTURE0);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glColor4f(0.0f, 0.0f, 0.0f, 0.5f);    // 50% transparent black.
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -840,7 +855,7 @@ static void drawBusyIndicator(int positionX, int positionY, int squareSize, stru
     glVertexPointer(2, GL_FLOAT, 0, square_vertices);
     glEnableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
-    glClientActiveTexture(GL_TEXTURE0);
+    glClientActiveTexture1(GL_TEXTURE0);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     
     for (i = 0; i < 4; i++) {
@@ -882,7 +897,7 @@ void drawView(void)
     float left, right, bottom, top;
     GLfloat *vertices = NULL;
     GLint vertexCount;
-    
+
     // Get frame time.
     gettimeofday(&time, NULL);
     
@@ -944,7 +959,7 @@ void drawView(void)
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
         glDisable(GL_BLEND);
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture1(GL_TEXTURE0);
         glDisable(GL_TEXTURE_2D);
 #else
         glStateCacheDisableDepthTest();
@@ -1006,7 +1021,7 @@ void drawView(void)
             glVertexPointer(2, GL_FLOAT, 0, vertices);
             glEnableClientState(GL_VERTEX_ARRAY);
             glDisableClientState(GL_NORMAL_ARRAY);
-            glClientActiveTexture(GL_TEXTURE0);
+            glClientActiveTexture1(GL_TEXTURE0);
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 #else
             glUseProgram(program);
@@ -1095,7 +1110,7 @@ void drawView(void)
     }
     
     // If a message should be onscreen, draw it.
-    if (gEdenMessageDrawRequired) EdenMessageDraw(0, p);
+    //if (gEdenMessageDrawRequired) EdenMessageDraw(0, p);
     
     SDL_GL_SwapWindow(gSDLWindow);
 }
@@ -1126,7 +1141,7 @@ static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, 
     
     // Save the parameter file.
     snprintf(paramPathname, SAVEPARAM_PATHNAME_LEN, "%s/%s/%06d-camera_para.dat", arUtilGetResourcesDirectoryPath(AR_UTIL_RESOURCES_DIRECTORY_BEHAVIOR_USE_APP_CACHE_DIR), QUEUE_DIR, ID);
-    
+	printf("file: %s\n", paramPathname);
     //if (arParamSave(strcat(strcat(docsPath,"/"),paramPathname), 1, param) < 0) {
     if (arParamSave(paramPathname, 1, param) < 0) {
         
@@ -1172,7 +1187,7 @@ static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, 
             focal_length = strdup("0.000");
         }
         
-        if (gCalibrationSave) {
+        if (gCalibrationSave || true) {
             
             // Assemble the filename.
             char calibrationSavePathname[SAVEPARAM_PATHNAME_LEN];
@@ -1193,7 +1208,7 @@ static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, 
                 len = strlen(calibrationSavePathname);
             }
             snprintf(&calibrationSavePathname[len], SAVEPARAM_PATHNAME_LEN - len, ".dat");
-            
+
             if (cp_f(paramPathname, calibrationSavePathname) != 0) {
                 ARLOGe("Error saving calibration to '%s'", calibrationSavePathname);
                 ARLOGperror(NULL);
@@ -1307,7 +1322,7 @@ static void saveParam(const ARParam *param, ARdouble err_min, ARdouble err_avg, 
         if (goodWrite) {
             unsigned char ss_md5[MD5_DIGEST_LENGTH];
             char ss_ascii[MD5_DIGEST_LENGTH*2 + 1]; // space for null terminator.
-            if (!MD5((unsigned char *)gCalibrationServerAuthenticationToken, (MD5_COUNT_t)strlen(gCalibrationServerAuthenticationToken), ss_md5)) {
+            if (false) {//!MD5((unsigned char *)gCalibrationServerAuthenticationToken, (MD5_COUNT_t)strlen(gCalibrationServerAuthenticationToken), ss_md5)) {
                 ARLOGe("Error calculating md5.\n");
                 goodWrite = false;
             } else {

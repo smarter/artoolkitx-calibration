@@ -122,12 +122,13 @@ void Calibration::CalibrationCornerFinderData::dealloc()
 
 
 std::map<Calibration::CalibrationPatternType, cv::Size> Calibration::CalibrationPatternSizes = {
-    {Calibration::CalibrationPatternType::CHESSBOARD, cv::Size(7, 5)},
-    {Calibration::CalibrationPatternType::ASYMMETRIC_CIRCLES_GRID, cv::Size(4, 11)}
+	{Calibration::CalibrationPatternType::CHESSBOARD, cv::Size(7, 5)},
+{Calibration::CalibrationPatternType::ASYMMETRIC_CIRCLES_GRID, cv::Size(4, 11)}
 };
 
 std::map<Calibration::CalibrationPatternType, float> Calibration::CalibrationPatternSpacings = {
-    {Calibration::CalibrationPatternType::CHESSBOARD, 30.0f},
+	{Calibration::CalibrationPatternType::CHESSBOARD, 28.5f},
+	//{Calibration::CalibrationPatternType::CHESSBOARD, 30.0f},
     {Calibration::CalibrationPatternType::ASYMMETRIC_CIRCLES_GRID, 20.0f}
 };
 
@@ -153,15 +154,20 @@ bool Calibration::frame(ARVideoSource *vs)
     //
     // Start of main calibration-related cycle.
     //
+	//printf("start frame\n");
     
     // First, see if an image has been completely processed.
     if (threadGetStatus(m_cornerFinderThread)) {
-        threadEndWait(m_cornerFinderThread); // We know from status above that worker has already finished, so this just resets it.
+        threadEndWait(m_cornerFinderThread); // We know from status above that worker has already finished, so this just resets it
+		//printf("end wait\n");
+
         
         // Copy the results.
+		//printf("lock\n");
         pthread_mutex_lock(&m_cornerFinderResultLock); // Results are also read by GL thread, so need to lock before modifying.
         m_cornerFinderResultData = m_cornerFinderData;
         pthread_mutex_unlock(&m_cornerFinderResultLock);
+		//printf("unlock\n");
     }
     
     // If corner finder worker thread is ready and waiting, submit the new image.
@@ -169,13 +175,17 @@ bool Calibration::frame(ARVideoSource *vs)
         // As corner finding takes longer than a single frame capture, we need to copy the incoming image
         // so that OpenCV has exclusive use of it. We copy into cornerFinderData->videoFrame which provides
         // the backing for calibImage.
-        AR2VideoBufferT *buff = vs->checkoutFrameIfNewerThan({0,0});
+		AR2VideoBufferT *buff = vs->checkoutFrameIfNewerThan({ 0,0 });
         if (buff) {
+            //printf("hi %d %d %d %d\n", vs->getVideoWidth(), vs->getVideoHeight(), buff->time.sec, buff->time.usec);
             memcpy(m_cornerFinderData.videoFrame, buff->buffLuma, vs->getVideoWidth()*vs->getVideoHeight());
             vs->checkinFrame();
+			//printf("checked\n");
             
             // Kick off a new cycle of the cornerFinder. The results will be collected on a subsequent cycle.
             threadStartSignal(m_cornerFinderThread);
+        } else {
+            //printf("ho\n");
         }
     }
     
@@ -204,44 +214,52 @@ bool Calibration::cornerFinderResultsUnlock(void)
 // static
 void *Calibration::cornerFinder(THREAD_HANDLE_T *threadHandle)
 {
-#ifdef DEBUG
+//#ifdef DEBUG
     ARLOGi("Start cornerFinder thread.\n");
-#endif
+//#endif
     
     CalibrationCornerFinderData *cornerFinderDataPtr = (CalibrationCornerFinderData *)threadGetArg(threadHandle);
     
     while (threadStartWait(threadHandle) == 0) {
-        
+		//printf("pattern start\n");
         switch (cornerFinderDataPtr->patternType) {
             case CalibrationPatternType::CHESSBOARD:
                 cornerFinderDataPtr->cornerFoundAllFlag = cv::findChessboardCorners(cv::cvarrToMat(cornerFinderDataPtr->calibImage), cornerFinderDataPtr->patternSize, cornerFinderDataPtr->corners, CV_CALIB_CB_FAST_CHECK|CV_CALIB_CB_ADAPTIVE_THRESH|CV_CALIB_CB_FILTER_QUADS);
                 break;
+			default:
+				printf("???\n");
+				exit(0);
+			/*
             case CalibrationPatternType::CIRCLES_GRID:
                 cornerFinderDataPtr->cornerFoundAllFlag = cv::findCirclesGrid(cv::cvarrToMat(cornerFinderDataPtr->calibImage), cornerFinderDataPtr->patternSize, cornerFinderDataPtr->corners, cv::CALIB_CB_SYMMETRIC_GRID);
                 break;
             case CalibrationPatternType::ASYMMETRIC_CIRCLES_GRID:
                 cornerFinderDataPtr->cornerFoundAllFlag = cv::findCirclesGrid(cv::cvarrToMat(cornerFinderDataPtr->calibImage), cornerFinderDataPtr->patternSize, cornerFinderDataPtr->corners, cv::CALIB_CB_ASYMMETRIC_GRID);
-                break;
+                break;*/
         }
-        ARLOGd("cornerFinderDataPtr->cornerFoundAllFlag=%d.\n", cornerFinderDataPtr->cornerFoundAllFlag);
+		//printf("pattern end\n");
+        //ARLOGi("cornerFinderDataPtr->cornerFoundAllFlag=%d.\n", cornerFinderDataPtr->cornerFoundAllFlag);
         threadEndSignal(threadHandle);
     }
     
-#ifdef DEBUG
+//#ifdef DEBUG
     ARLOGi("End cornerFinder thread.\n");
-#endif
+//#endif
     return (NULL);
 }
 
 bool Calibration::capture()
 {
+	printf("capture start %d\n", m_corners.size());
     if (m_corners.size() >= m_calibImageCountMax) return false;
    
     bool saved = false;
     
+	printf("capture lock\n");
     pthread_mutex_lock(&m_cornerFinderResultLock);
     if (m_cornerFinderResultData.cornerFoundAllFlag) {
         // Refine the corner positions.
+		printf("Refining\n");
         cornerSubPix(cv::cvarrToMat(m_cornerFinderResultData.calibImage), m_cornerFinderResultData.corners, cv::Size(5,5), cvSize(-1,-1), cv::TermCriteria(CV_TERMCRIT_ITER, 100, 0.1));
         
         // Save the corners.

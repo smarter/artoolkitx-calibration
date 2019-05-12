@@ -108,7 +108,7 @@ static bool getNextFileInQueueWithExtension(const char *queueDir, const char *ex
 		if (!ext0) continue;
 		if (strcmp(ext0, ext) == 0) {
     		free(ext0);
-    		snprintf(buf, len, "%s/%s", queueDir, direntp->d_name);
+    		snprintf(buf, len, "%s\\%s", queueDir, direntp->d_name);
     		break;
 		}
 		free(ext0);
@@ -399,7 +399,7 @@ static void *fileUploader(THREAD_HANDLE_T *threadHandle)
             }
 
             // Adjust the "hide after" time.
-            timeradd(&time, &(fileUploaderHandle->uploadStatusHideAfterSecs), &(fileUploaderHandle->uploadStatusHideAtTime));
+            //timeradd(&time, &(fileUploaderHandle->uploadStatusHideAfterSecs), &(fileUploaderHandle->uploadStatusHideAtTime));
         }
         pthread_mutex_unlock(&(fileUploaderHandle->uploadStatusLock));
 

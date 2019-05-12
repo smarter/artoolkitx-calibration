@@ -111,9 +111,10 @@ set(OpenGL3_INCLUDE_PATH ${ARTOOLKITX_HOME}/Source/depends/windows/include)
     include_directories(${PTHREAD_INCLUDE_DIRS})
 #endif()
 
+SET(EDEN_LIBRARIES "${ARTOOLKITX_HOME}/Source/build/depends/common/src/Eden/Debug/Eden.lib")
 
-#find_package(JPEG REQUIRED)
-##include_directories(${JPEG_INCLUDE_DIR})
+find_package(JPEG REQUIRED)
+include_directories(${JPEG_INCLUDE_DIR})
 
 set(OpenCV_PATH "${ARTOOLKITX_HOME}/Source/depends/windows")
 find_package(OpenCV)
@@ -146,7 +147,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4068 /wd4244 /wd4996")
 find_package(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIRS})
 
-find_package(OpenSSL REQUIRED)
+include_directories("${ARTOOLKITX_HOME}/SDK/include")
+
+#find_package(OpenSSL REQUIRED)
 #include_directories(${CURL_INCLUDE_DIRS})
 
 # find_package(PkgConfig)
@@ -175,41 +178,41 @@ set(SOURCE
     ../prefs.hpp
     ../prefsLibConfig.cpp
     ../prefsNull.cpp
-    ../Eden/Eden.h
-    ../Eden/EdenError.h
-    ../Eden/EdenGLFont.c
-    ../Eden/EdenGLFont.h
-    ../Eden/EdenMath.h
-    ../Eden/EdenMessage.c
-    ../Eden/EdenMessage.h
-    ../Eden/EdenSurfaces.c
-    ../Eden/EdenSurfaces.h
-    ../Eden/EdenTime.c
-    ../Eden/EdenTime.h
-    ../Eden/EdenUtil.c
-    ../Eden/EdenUtil.h
-    ../Eden/EdenUIInput.c
-    ../Eden/EdenUIInput.h
-    ../Eden/glStateCache.c
-    ../Eden/glStateCache.h
-    ../Eden/gluttext.h
-    ../Eden/readtex.c
-    ../Eden/readtex.h
-    ../Eden/gluttext/glut_8x13.c
-    ../Eden/gluttext/glut_9x15.c
-    ../Eden/gluttext/glut_bitmap.c
-    ../Eden/gluttext/glut_bwidth.c
-    ../Eden/gluttext/glut_hel10.c
-    ../Eden/gluttext/glut_hel12.c
-    ../Eden/gluttext/glut_hel18.c
-    ../Eden/gluttext/glut_mroman.c
-    ../Eden/gluttext/glut_roman.c
-    ../Eden/gluttext/glut_stroke.c
-    ../Eden/gluttext/glut_swidth.c
-    ../Eden/gluttext/glut_tr10.c
-    ../Eden/gluttext/glut_tr24.c
-    ../Eden/gluttext/glutbitmap.h
-    ../Eden/gluttext/glutstroke.h
+    # ../Eden/Eden.h
+    # ../Eden/EdenError.h
+    # ../Eden/EdenGLFont.c
+    # ../Eden/EdenGLFont.h
+    # ../Eden/EdenMath.h
+    # ../Eden/EdenMessage.c
+    # ../Eden/EdenMessage.h
+    # ../Eden/EdenSurfaces.c
+    # ../Eden/EdenSurfaces.h
+    # ../Eden/EdenTime.c
+    # ../Eden/EdenTime.h
+    # ../Eden/EdenUtil.c
+    # ../Eden/EdenUtil.h
+    # ../Eden/EdenUIInput.c
+    # ../Eden/EdenUIInput.h
+    # ../Eden/glStateCache.c
+    # ../Eden/glStateCache.h
+    # ../Eden/gluttext.h
+    # ../Eden/readtex.c
+    # ../Eden/readtex.h
+    # ../Eden/gluttext/glut_8x13.c
+    # ../Eden/gluttext/glut_9x15.c
+    # ../Eden/gluttext/glut_bitmap.c
+    # ../Eden/gluttext/glut_bwidth.c
+    # ../Eden/gluttext/glut_hel10.c
+    # ../Eden/gluttext/glut_hel12.c
+    # ../Eden/gluttext/glut_hel18.c
+    # ../Eden/gluttext/glut_mroman.c
+    # ../Eden/gluttext/glut_roman.c
+    # ../Eden/gluttext/glut_stroke.c
+    # ../Eden/gluttext/glut_swidth.c
+    # ../Eden/gluttext/glut_tr10.c
+    # ../Eden/gluttext/glut_tr24.c
+    # ../Eden/gluttext/glutbitmap.h
+    # ../Eden/gluttext/glutstroke.h
 )
 
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCE})
@@ -221,14 +224,30 @@ add_dependencies(${CMAKE_PROJECT_NAME}
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
     INSTALL_RPATH "\$ORIGIN"
 )
-
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /VERBOSE:LIB")
 target_link_libraries(${CMAKE_PROJECT_NAME}
-    ARX
+    #ARX
+    "${ARTOOLKITX_HOME}/Source/build/ARX/Debug/ARX.lib"
     ${SDL2_LIBRARY}
     ${JPEG_LIBRARIES}
-    ${OPENCV_CALIB3D_LIBRARY} ${OPENCV_FEATURES2D_LIBRARY} ${OPENCV_IMGPROC_LIBRARY} ${OPENCV_FLANN_LIBRARY} ${OPENCV_CORE_LIBRARY}
-    ${CURL_LIBRARIES} ${OPENSSL_LIBRARIES}
-    ${LIBCONFIG_LIBRARIES} ${PTHREAD_LIBRARIES}
+    "${ARTOOLKITX_HOME}/Source/depends/windows/lib/x64/opencv_calib3d341d.lib"
+    "${ARTOOLKITX_HOME}/Source/depends/windows/lib/x64/opencv_core341d.lib"
+    "${ARTOOLKITX_HOME}/Source/depends/windows/lib/x64/opencv_features2d341d.lib"
+    "${ARTOOLKITX_HOME}/Source/depends/windows/lib/x64/opencv_imgproc341d.lib"
+    # ${OpenCV_LIB_CALIB32} 
+    # ${OpenCV_LIB_CORE} 
+    # ${OpenCV_LIB_FEATURES2D} 
+    # ${OpenCV_LIB_FLANN}
+    # ${OpenCV_LIB_HIGHGUI} 
+    # ${OpenCV_LIB_IMGCODECS} 
+    # ${OpenCV_LIB_IMGPROC}
+    # ${OpenCV_LIB_VIDEO} 
+    # ${OpenCV_LIB_VIDEOIO} 
+    ${CURL_LIBRARIES}
+    #${OPENSSL_LIBRARIES}
+    #${SSL_EAY_RELEASE}
+    ${EDEN_LIBRARIES}
+    ${PTHREAD_LIBRARIES}
     #pthread
     #m
 )
